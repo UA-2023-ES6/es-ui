@@ -1,38 +1,20 @@
-import { useEffect, useState } from "react"
+import MainPage from "./pages/MainPage"
+import ServerTime from "./pages/ServerTime";
+import NoPage from "./pages/NoPage"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
     return(
         <>
-            <ServerTime />
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<MainPage />}/>
+                <Route path="serverTime" element={<ServerTime />} />
+                <Route path="*" element={<NoPage />} />
+            </Routes>
+        </BrowserRouter>
         </>
     )
-  
 }
-
-function ServerTime() {
-    const SERVER_API = "https://localhost:7217/api"
-    const [time,setTime] = useState('')
-
-    const fetch_server_time = async () => {
-        try{
-            const response = await fetch(`${SERVER_API}/Time/Server`)
-            const data = await response.json()
-            setTime(data.serverTime)
-        }
-        catch{
-            setTime("failed to get server time")
-        }
-    }
-
-    useEffect(() => {
-        fetch_server_time()
-    },[])
-
-    return(
-        <h1>{time}</h1>
-    )
-}
-
-
 
 export default App;

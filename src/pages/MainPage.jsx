@@ -5,6 +5,7 @@ import bannerImg from "../imgs/MainPage/banner.png"
 import lonelyStudent from "../imgs/MainPage/lonely_student.svg"
 import groupStudents from "../imgs/MainPage/group_students.jpg"
 import partyStudents from "../imgs/MainPage/party_students.svg"
+import Footer from "../components/Footer"
 
 const MainPage = () => {
     return(
@@ -51,6 +52,7 @@ const MainPage = () => {
                     </div>
                 </CenteredContent>
             </div>
+            <Footer />
         </>
     )
 }

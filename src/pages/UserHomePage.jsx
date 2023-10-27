@@ -1,23 +1,10 @@
-import Header from "../components/Header"
-import Footer from "../components/Footer"
-
-const UserHomePage = () => {
-    const userGroups = [
-        "grupo 1",
-        "grupo 2",
-        "grupo 3",
-        "grupo 4"
-    ]
-
-    
+const UserHomePage = ({userGroups}) => {
     return(
         <>
-        <div className="d-flex flex-column" style={{height: "100vh"}}>
-            <Header userGroups={userGroups}/>
-                <div style={{flex: "1"}}>
-                    {userGroups.length == 0 ? <NoGroups /> : <Test groups={userGroups}/>}
-                </div>
-            <Footer />
+        <div className="d-flex flex-column" style={{height: "100%"}}>
+            <div style={{flex: "1"}}>
+                {userGroups.length === 0 ? <NoGroups /> : <Test groups={userGroups}/>}
+            </div>
         </div>
         </>
     )

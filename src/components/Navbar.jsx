@@ -13,7 +13,6 @@ const Navbar = ({userGroups}) => {
 }
 
 const NavbarLinks = ({userGroups}) => {
-    console.log(userGroups)
     return(
         <nav className="navbar navbar-expand-lg" aria-label="navbar">
             <div className="container">

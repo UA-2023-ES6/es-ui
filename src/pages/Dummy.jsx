@@ -1,6 +1,25 @@
+import { Link, useParams } from "react-router-dom"
 import Sidebar from "../components/Sidebar"
 
 const Dummy = () => {
+    const {"*": currentPath} = useParams()
+    console.log(currentPath)
+    if(currentPath === "") {
+        return(
+            <>
+                <h1>Dummy page for testing</h1>
+                <p>in the future replace this code with an automatic redirect to </p>
+                <Link to={"/*"}>
+                    <button>here</button>
+                </Link>
+
+                <p>if you're here to test the groups page go </p>
+                <Link to={"Instituicao"}>
+                    <button>here</button>
+                </Link>
+            </>
+        )
+    }
     const instituicao = {
         "Instituicao": {
                 "turma1": ["grupo1","grupo2","grupo3"],
@@ -16,7 +35,7 @@ const Dummy = () => {
     return(
         <>
             <div className="d-flex flex-column" style={{height: "100%"}}>
-                <Sidebar content={instituicao} activeLink="Instituicao"/>
+                <Sidebar content={instituicao} activeLink={currentPath}/>
             </div>
         </>
     )

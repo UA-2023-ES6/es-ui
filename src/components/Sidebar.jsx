@@ -4,11 +4,11 @@ import "../styles/sidebar.css"
 var _activeLink = ""
 //exemplo de activeLink: Instituicao/test/subturma1
 
-const Sidebar = ({content,activeLink=""}) => {
+const Sidebar = ({content,activeLink="",baseLink=""}) => {
     _activeLink = activeLink
     var x = ""
     if(content != null) {
-        x = <SidebarEntry content={content} />
+        x = <SidebarEntry content={content} baseLink={baseLink}/>
     }
     return(
         <>
@@ -17,7 +17,7 @@ const Sidebar = ({content,activeLink=""}) => {
     )
 }
 
-function SidebarEntry({content}) {
+function SidebarEntry({content,baseLink}) {
     return(
         <div className="d-flex flex-column p-3 bg-body-tertiary" style={{width: "280px",flex: "1"}}>
             <ul className="nav nav-pills flex-column mb-auto">
@@ -25,11 +25,11 @@ function SidebarEntry({content}) {
                     Object.entries(content).map(([_name,_content]) => {
                         return(
                             <li className="nav-item ps-3" key={_name}>
-                                <LinkButton name={_name} parentLink=""/>
+                                <LinkButton name={_name} parentLink={baseLink}/>
                                 <div className="d-flex flex-column">
                                     <ul className="nav nav-pills flex-column mb-auto">
                                         {
-                                            <CollapsableGroup content={content} parent={_name.replace(/\s/g) + "/"} />
+                                            <CollapsableGroup content={_content} parent={_name.replace(/\s/g) + "/"} />
                                         }
                                     </ul>
                                 </div>

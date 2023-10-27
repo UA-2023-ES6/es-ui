@@ -26,7 +26,7 @@ function App() {
                         <Route path="/home" element={<UserHomePage userGroups={userGroups}/>}/>
                         <Route path="/groupName" element={<UserGroupPage />}/>
                         <Route path="/serverTime" element={<ServerTime />} />
-                        <Route path="/dummy" element={<Dummy />} />
+                        <Route path="/dummy/*" element={<Dummy />} />
                         <Route path="*" element={<NoPage />} />
                     </Routes>
                 </BrowserRouter>

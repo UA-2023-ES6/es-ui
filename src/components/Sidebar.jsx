@@ -1,35 +1,44 @@
 import { Link } from "react-router-dom"
+import "../styles/sidebar.css"
 
 var _activeLink = ""
 //exemplo de activeLink: Instituicao/test/subturma1
 
 const Sidebar = ({content,activeLink=""}) => {
-    const turmas = {
-        "turma1": ["grupo1","grupo2","grupo3"],
-        "test": {
-            "sub turma1": ["grupo1","grupo2","grupo3"],
-            "sub turma2": ["grupo1","grupo2","grupo3"]
-        },
-        "turma2": ["grupo1","grupo2","grupo3"],
-        "turma3": ["grupo1","grupo2","grupo3"],
-        "turma4": ["grupo1","grupo2","grupo3"],
-    }
     _activeLink = activeLink
+    var x = ""
+    if(content != null) {
+        x = <SidebarEntry content={content} />
+    }
     return(
-    <div className="d-flex flex-column p-3 bg-body-tertiary" style={{width: "280px",flex: "1"}}>
-    <ul className="nav nav-pills flex-column mb-auto">
-      <li className="nav-item ps-3">
-        <LinkButton name="Instituicao" parentLink=""/>
-        <div className="d-flex flex-column">
+        <>
+            {x}
+        </>
+    )
+}
+
+function SidebarEntry({content}) {
+    return(
+        <div className="d-flex flex-column p-3 bg-body-tertiary" style={{width: "280px",flex: "1"}}>
             <ul className="nav nav-pills flex-column mb-auto">
                 {
-                    <CollapsableGroup content={turmas} parent="Instituicao/" />
+                    Object.entries(content).map(([_name,_content]) => {
+                        return(
+                            <li className="nav-item ps-3" key={_name}>
+                                <LinkButton name={_name} parentLink=""/>
+                                <div className="d-flex flex-column">
+                                    <ul className="nav nav-pills flex-column mb-auto">
+                                        {
+                                            <CollapsableGroup content={content} parent={_name.replace(/\s/g) + "/"} />
+                                        }
+                                    </ul>
+                                </div>
+                            </li>
+                        )
+                    })
                 }
             </ul>
         </div>
-      </li>
-    </ul>
-  </div>
     )
 }
 
@@ -51,9 +60,9 @@ function CollapsableGroup({content= null,parent}) {
 
 
     return(
-        <div>
+        <>
             {x}
-        </div>
+        </>
     )
 }
 
@@ -86,7 +95,6 @@ function ListElement({text,parent}) {
 function LinkButton({name,parentLink}) {
     var link = parentLink + name.replace(/\s+/g, "")
     var active = link == _activeLink
-    console.log(_activeLink,link)
     return(
         <>
             <Link to={link}>

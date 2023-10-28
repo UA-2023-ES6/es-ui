@@ -4,11 +4,11 @@ import "../styles/sidebar.css"
 var _activeLink = ""
 //exemplo de activeLink: Instituicao/test/subturma1
 
-const Sidebar = ({content,activeLink="",baseLink=""}) => {
+const Sidebar = ({content,activeLink="",baseLink="",onClick=(name,parentLink) => {}}) => {
     _activeLink = activeLink
     var x = ""
     if(content != null) {
-        x = <SidebarEntry content={content} baseLink={baseLink}/>
+        x = <SidebarEntry content={content} baseLink={baseLink} onClick={onClick}/>
     }
     return(
         <>
@@ -17,7 +17,7 @@ const Sidebar = ({content,activeLink="",baseLink=""}) => {
     )
 }
 
-function SidebarEntry({content,baseLink}) {
+function SidebarEntry({content,baseLink,onClick=(name,parentLink) => {}}) {
     return(
         <div className="d-flex flex-column p-3 bg-body-tertiary" style={{width: "280px",flex: "1"}}>
             <ul className="nav nav-pills flex-column mb-auto">
@@ -35,11 +35,11 @@ function SidebarEntry({content,baseLink}) {
                     Object.entries(content).map(([_name,_content]) => {
                         return(
                             <li className="nav-item ps-3" key={_name}>
-                                <LinkElement name={_name} parentLink={baseLink} includeAddBtn={true}/>
+                                <LinkElement name={_name} parentLink={baseLink} includeAddBtn={true} onClick={onClick}/>
                                 <div className="d-flex flex-column">
                                     <ul className="nav nav-pills flex-column mb-auto">
                                         {
-                                            <CollapsableGroup content={_content} parent={_name.replace(/\s/g) + "/"} />
+                                            <CollapsableGroup content={_content} parent={_name.replace(/\s/g) + "/"} onClick={onClick}/>
                                         }
                                     </ul>
                                 </div>
@@ -52,18 +52,18 @@ function SidebarEntry({content,baseLink}) {
     )
 }
 
-function CollapsableGroup({content= null,parent}) {
+function CollapsableGroup({content= null,parent,onClick=(name,parentLink) => {}}) {
     var x = ""
 
     if(content != null) {
         if(content.constructor == Object) {
             x = Object.entries(content).map(([_name,_content]) => {
-                return <Group name={_name} content={_content} parent={parent} key={_name} />
+                return <Group name={_name} content={_content} parent={parent} key={_name} onClick={onClick}/>
             })
         }
         else {
             x = content.map((_name) => {
-                return <ListElement text={_name} parent={parent} key={_name} />
+                return <ListElement text={_name} parent={parent} key={_name} onClick={onClick}/>
             })
         }
     }
@@ -76,7 +76,7 @@ function CollapsableGroup({content= null,parent}) {
     )
 }
 
-function Group({name,content,parent}) {
+function Group({name,content,parent,onClick=(name,parentLink) => {}}) {
     return(
         <>
             <div className="d-flex add-btn-group align-items-center">
@@ -84,12 +84,12 @@ function Group({name,content,parent}) {
                     <button className="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target={"#" + name.replace(/\s/g, "") + "-collapse"} aria-expanded="true"/>
                     <LinkElement name={name} parentLink={parent}/>
                 </div>
-                <button className="btn add-btn"/>
+                <button className="btn add-btn" onClick={() => {onClick(name,parent)}}/>
             </div>
             <div className="collapse show" style={{paddingLeft: "2rem"}} id={name.replace(/\s+/g, "") + "-collapse"}>
                 <ul className="btn-toggle-nav list-unstyled">
                     {
-                        <CollapsableGroup content={content} parent={parent + name.replace(/\s+/g, "") + "/"}/>
+                        <CollapsableGroup content={content} parent={parent + name.replace(/\s+/g, "") + "/"} onClick={onClick}/>
                     }
                 </ul>
             </div>
@@ -97,15 +97,15 @@ function Group({name,content,parent}) {
     )
 }
 
-function ListElement({text,parent}) {
+function ListElement({text,parent,onClick=(name,parentLink) => {}}) {
     return(
         <li className="ps-4">
-            <LinkElement name={text} parentLink={parent} includeAddBtn={true}/>
+            <LinkElement name={text} parentLink={parent} includeAddBtn={true} onClick={onClick}/>
         </li>
     )
 }
 
-function LinkElement({name,parentLink,includeAddBtn=false}) {
+function LinkElement({name,parentLink,includeAddBtn=false,onClick=(name,parentLink) => {}}) {
     var link = parentLink + name.replace(/\s+/g, "")
     var active = link == _activeLink
     const x = <LinkButton link={link} name={name} active={active} />
@@ -116,7 +116,7 @@ function LinkElement({name,parentLink,includeAddBtn=false}) {
                     includeAddBtn ? <><div style={{flex: "1"}}>
                                 {x}
                             </div>
-                            <button className="btn add-btn"/>
+                            <button className="btn add-btn" onClick={() => {onClick(name,parentLink)}}/>
                             </>
                             : <>{x}</>
                 }

@@ -25,9 +25,10 @@
     transform: rotate(90deg);
 }
 
-.add-btn {
+.add-btn{
     opacity: 0;
 }
+
 .add-btn::before {
     content: "+";
     width: 1.25em;

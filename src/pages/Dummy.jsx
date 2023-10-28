@@ -1,6 +1,10 @@
 import { Link, useParams } from "react-router-dom"
 import Sidebar from "../components/Sidebar"
 
+function test(name,parent) {
+    alert("name:" + name + "; parent:" + parent)
+}
+
 const Dummy = () => {
     const {"*": currentPath} = useParams()
     console.log(currentPath)
@@ -35,7 +39,8 @@ const Dummy = () => {
     return(
         <>
             <div className="d-flex flex-column" style={{height: "100%"}}>
-                <Sidebar content={instituicao} activeLink={currentPath}/>
+                <Sidebar content={instituicao} activeLink={currentPath} onClick={test}/>
+                {/* alternative a onClick seria inline: (name,parent) => { conteudo da funcao } */}
             </div>
         </>
     )

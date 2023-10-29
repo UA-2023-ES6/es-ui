@@ -21,16 +21,6 @@ function SidebarEntry({content,baseLink,onClick=(name,parentLink) => {}}) {
     return(
         <div className="d-flex flex-column p-3 bg-body-tertiary" style={{width: "280px",flex: "1"}}>
             <ul className="nav nav-pills flex-column mb-auto">
-                <li className="nav-item ps-3">
-                    <div className="d-flex add-btn-group">
-                        <div style={{flex: "1"}}>
-                            {"test"}
-                        </div>
-                        <div className="add-btn">
-                            {"test2"}
-                        </div>
-                    </div>
-                </li>
                 {
                     Object.entries(content).map(([_name,_content]) => {
                         return(

@@ -1,5 +1,5 @@
 import { useState,useEffect } from "react"
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"
 
 const ServerTime = () => {
     const SERVER_API = "https://localhost:7217/api"

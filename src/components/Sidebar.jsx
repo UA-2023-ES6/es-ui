@@ -2,7 +2,7 @@ import "../styles/sidebar.css"
 
 const Sidebar = ({children}) => {
     return(
-        <div className="d-flex flex-column p-3 bg-body-tertiary" style={{width: "280px",flex: "1"}}>
+        <div className="d-flex flex-column p-3 bg-body-tertiary" style={{width: "280px",flex: "1", position: "relative"}}>
             <ul className="nav nav-pills flex-column mb-auto">
                 {children}
             </ul>

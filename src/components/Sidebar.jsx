@@ -10,7 +10,7 @@ const Sidebar = ({children}) => {
     )
 }
 
-const SidebarGroupHeader = ({children,header,headerKey}) => {
+const SidebarGroup = ({children,header,headerKey}) => {
     return(
         <>
         <li className="nav-item ps-3" >
@@ -37,4 +37,4 @@ const SidebarElement = ({children}) => {
     )
 }
 
-export {Sidebar,SidebarGroupHeader,SidebarElement}
+export {Sidebar,SidebarGroup,SidebarElement}

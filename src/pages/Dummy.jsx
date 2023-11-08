@@ -82,29 +82,29 @@ const Dummy = () => {
         const t = JSON.stringify(data)
         console.log(t)
 
-        // try {
-        //     fetch(`${SERVER_API}/Group`,{
-        //         method: "POST",
-        //         mode: "cors",
-        //         headers: {
-        //             "Content-Type": "application/json"
-        //         },
-        //         body: t
-        //     })
-        // }
-        // catch {
-        //     console.error("failed to post to API")
-        // }
+        try {
+            fetch(`${SERVER_API}/Group`,{
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: t
+            })
+        }
+        catch {
+            console.error("failed to post to API")
+        }
         handleClose()
         setUpdateFlag(!updateFlag)
     }
 
 
-    // useEffect(() => {
-    //     getGroups().then((data) => {
-    //         setSidebarContent(data)
-    //     })
-    // },[updateFlag])
+    useEffect(() => {
+        getGroups().then((data) => {
+            setSidebarContent(data)
+        })
+    },[updateFlag])
 
     if(currentPath === "") {
         return(

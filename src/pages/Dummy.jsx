@@ -5,52 +5,48 @@ import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
 
 const test = {
-    id: 1,
-    name: "UA",
-    groups:
-    [
-        {
+    data: [
+      {
+        id: 1,
+        name: "Default Institution",
+        usersIds: [],
+        subGroup: [
+          {
             id: 2,
-            name:"turma1",
-            groups:
-            [
-                // {
-                // id: 1,
-                // name: "grupo1",
-                // usersIds: [
-                //     {
-                //     id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                //     name: "user1",
-                //     email: "user1@mail.com"
-                //     }
-                // ]
-                // },
-                // {
-                //     id: 2,
-                //     name: "grupo2",
-                //     usersIds: [
-                //     {
-                //         id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                //         name: "user1",
-                //         email: "user1@mail.com"
-                //     }
-                //     ]
-                // },
-                // {
-                //     id: 3,
-                //     name: "grupo3",
-                //     usersIds: [
-                //     {
-                //         id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                //         name: "user1",
-                //         email: "user1@mail.com"
-                //     }
-                //     ]
-                // }
-            ] 
-        }
+            name: "Group 1",
+            usersIds: [],
+            subGroup: [
+              {
+                id: 3,
+                name: "Group 1.1",
+                usersIds: [],
+                subGroup: [
+                  {
+                    id: 4,
+                    name: "Group 1.1.1",
+                    usersIds: [],
+                    subGroup: []
+                  }
+                ]
+              },
+              {
+                id: 5,
+                name: "Group 1.2",
+                usersIds: [],
+                subGroup: []
+              }
+            ]
+          },
+          {
+            id: 6,
+            name: "Group 2",
+            usersIds: [],
+            subGroup: []
+          }
+        ]
+      }
     ]
-}
+  }
 
 const SERVER_API = "https://localhost:7217/api"
 
@@ -59,9 +55,9 @@ const Dummy = () => {
     const [groupName,setGroupName] = useState("")
     const [path,setPath] = useState("/" + test.name)
     const [sidebarContent,setSidebarContent] = useState([])
-    test.groups[0].groups = sidebarContent
+    //test.groups[0].groups = sidebarContent
 
-    const [updateFlag,setUpdateFlag] = useState(false)
+    //const [updateFlag,setUpdateFlag] = useState(false)
     const [id,setGroupID] = useState(-1)
 
     const [show,setShow] = useState(false)
@@ -76,7 +72,7 @@ const Dummy = () => {
         console.log(groupName)
         const data = {
             name: groupName,
-            classId: id
+            parentGroupId: id
         }
 
         const t = JSON.stringify(data)
@@ -96,7 +92,6 @@ const Dummy = () => {
             console.error("failed to post to API")
         }
         handleClose()
-        setUpdateFlag(!updateFlag)
     }
 
 
@@ -104,7 +99,7 @@ const Dummy = () => {
         getGroups().then((data) => {
             setSidebarContent(data)
         })
-    },[updateFlag])
+    },[])
 
     if(currentPath === "") {
         return(
@@ -127,7 +122,8 @@ const Dummy = () => {
         <>
             <div className="d-flex flex-column" style={{height: "100%"}}>
                 <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                <MySidebar content={test} onAddClick={handleShow} onElementClick={(path) => {setPath(path)}} activeLink={path} basePath={""}/>
+                <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={(path) => {setPath(path)}} activeLink={path} basePath={""}/>
+                
             </div>
         </>
     )
@@ -148,7 +144,7 @@ async function getGroups() {
 function MySidebar({content,onAddClick,onElementClick,activeLink,basePath}) {
     return(
         <Sidebar>
-            <SidebarContent content={content} onAddClick={onAddClick} onElementClick={onElementClick} activeLink={activeLink} parentPath={basePath}/>
+            {content.map((institution) => <SidebarContent key={institution.name} content={institution} onAddClick={onAddClick} onElementClick={onElementClick} activeLink={activeLink} parentPath={basePath}/> )}
         </Sidebar>
     )
 }
@@ -156,11 +152,11 @@ function MySidebar({content,onAddClick,onElementClick,activeLink,basePath}) {
 function SidebarContent({content,onAddClick,parentPath,onElementClick,activeLink}) {
     var innerContent = ""
     const path = parentPath + "/" + content.name
-    if(content.constructor === Object && "groups" in content && content.groups.length > 0) {
+    if(content.constructor === Object && "subGroup" in content && content.subGroup.length > 0) {
         innerContent = <>
             <SidebarGroup header={<Header title={content.name} onAddClick={onAddClick} activeLink={activeLink} onElementClick={onElementClick} path={path} id={content.id}/>} headerKey={content.name}>
                 {
-                    content.groups.map((group) => {return <SidebarContent key={group.name} content={group} onAddClick={onAddClick} parentPath={path} onElementClick={onElementClick} activeLink={activeLink}/>})
+                    content.subGroup.map((group) => {return <SidebarContent key={group.name} content={group} onAddClick={onAddClick} parentPath={path} onElementClick={onElementClick} activeLink={activeLink}/>})
                 }
             </SidebarGroup>
         </>
@@ -213,7 +209,7 @@ function Header({title,onAddClick,activeLink,onElementClick,path,id}) {
     return(
         <div className="d-flex add-btn-group align-items-center">
             <div className="d-flex align-items-center" style={{flex: "1"}}>
-                <button className="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target={"#" + title.replace(/\s/g, "") + "-collapse"} aria-expanded="true"/>
+                <button className="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target={"#" + title.replace(/[\s\.-]+/gs, "") + "-collapse"} aria-expanded="true"/>
                 <LinkButton name={title} activeLink={activeLink} onElementClick={onElementClick} path={path}/>
             </div>
             <AddBtn onClick={onAddClick} id={id}/>

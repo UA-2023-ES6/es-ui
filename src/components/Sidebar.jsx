@@ -17,7 +17,7 @@ const SidebarGroup = ({children,header,headerKey}) => {
             <div className="d-flex flex-column">
                 <ul className="nav nav-pills flex-column mb-auto">
                     {header}
-                    <div className="collapse show" style={{paddingLeft: "2rem"}} id={headerKey.replace(/\s+/g, "") + "-collapse"}>
+                    <div className="collapse show" style={{paddingLeft: "2rem"}} id={headerKey.replace(/[\s\.-]+/gs, "") + "-collapse"}>
                         <ul className="btn-toggle-nav list-unstyled">
                             {children}
                         </ul>

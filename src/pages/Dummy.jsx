@@ -13,7 +13,7 @@ const test = {
         subGroup: [
           {
             id: 2,
-            name: "Group 1",
+            name: "5",
             usersIds: [],
             subGroup: [
               {
@@ -24,6 +24,12 @@ const test = {
                   {
                     id: 4,
                     name: "Group 1.1.1",
+                    usersIds: [],
+                    subGroup: []
+                  },
+                  {
+                    id: 7,
+                    name: "5",
                     usersIds: [],
                     subGroup: []
                   }
@@ -78,19 +84,14 @@ const Dummy = () => {
         const t = JSON.stringify(data)
         console.log(t)
 
-        try {
-            fetch(`${SERVER_API}/Group`,{
-                method: "POST",
-                mode: "cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: t
-            })
-        }
-        catch {
-            console.error("failed to post to API")
-        }
+        fetch(`${SERVER_API}/Group`,{
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: t
+        }).catch(err => console.log(err))
         handleClose()
     }
 
@@ -154,10 +155,12 @@ function SidebarContent({content,onAddClick,parentPath,onElementClick,activeLink
     const path = parentPath + "/" + content.name
     if(content.constructor === Object && "subGroup" in content && content.subGroup.length > 0) {
         innerContent = <>
-            <SidebarGroup header={<Header title={content.name} onAddClick={onAddClick} activeLink={activeLink} onElementClick={onElementClick} path={path} id={content.id}/>} headerKey={content.name}>
-                {
-                    content.subGroup.map((group) => {return <SidebarContent key={group.name} content={group} onAddClick={onAddClick} parentPath={path} onElementClick={onElementClick} activeLink={activeLink}/>})
-                }
+            <SidebarGroup>
+                <Group title={content.name} onAddClick={onAddClick} activeLink={activeLink} onElementClick={onElementClick} path={path} id={content.id} headerKey={"g" + content.id}>
+                    {
+                        content.subGroup.map((group) => {return <SidebarContent key={group.name} content={group} onAddClick={onAddClick} parentPath={path} onElementClick={onElementClick} activeLink={activeLink}/>})
+                    }
+                </Group>
             </SidebarGroup>
         </>
     }
@@ -205,15 +208,22 @@ function CreateGroupModal({show,handleClose,onNameChange,onCreate}) {
 }
 
 //sidebar helper functions
-function Header({title,onAddClick,activeLink,onElementClick,path,id}) {
+function Group({title,onAddClick,activeLink,onElementClick,path,id,headerKey,children}) {
     return(
-        <div className="d-flex add-btn-group align-items-center">
-            <div className="d-flex align-items-center" style={{flex: "1"}}>
-                <button className="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target={"#" + title.replace(/[\s\.-]+/gs, "") + "-collapse"} aria-expanded="true"/>
-                <LinkButton name={title} activeLink={activeLink} onElementClick={onElementClick} path={path}/>
+        <>
+            <div className="d-flex add-btn-group align-items-center">
+                <div className="d-flex align-items-center" style={{flex: "1"}}>
+                    <button className="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target={"#" + headerKey + "-collapse"} aria-expanded="true"/>
+                    <LinkButton name={title} activeLink={activeLink} onElementClick={onElementClick} path={path}/>
+                </div>
+                <AddBtn onClick={onAddClick} id={id}/>
             </div>
-            <AddBtn onClick={onAddClick} id={id}/>
-        </div>
+            <div className="collapse show" style={{paddingLeft: "2rem"}} id={headerKey + "-collapse"}>
+                <ul className="btn-toggle-nav list-unstyled">
+                    {children}
+                </ul>
+            </div>
+        </>
     )
 }
 

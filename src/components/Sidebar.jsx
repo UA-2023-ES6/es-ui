@@ -10,18 +10,13 @@ const Sidebar = ({children}) => {
     )
 }
 
-const SidebarGroup = ({children,header,headerKey}) => {
+const SidebarGroup = ({children}) => {
     return(
         <>
         <li className="nav-item ps-3" >
             <div className="d-flex flex-column">
                 <ul className="nav nav-pills flex-column mb-auto">
-                    {header}
-                    <div className="collapse show" style={{paddingLeft: "2rem"}} id={headerKey.replace(/[\s\.-]+/gs, "") + "-collapse"}>
-                        <ul className="btn-toggle-nav list-unstyled">
-                            {children}
-                        </ul>
-                    </div>
+                    {children}                  
                 </ul>
             </div>
         </li>

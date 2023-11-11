@@ -3,17 +3,24 @@ import { Message } from './Message';
 
 const UserChat = () => {
   const [messages, setMessages] = useState([]);
-
+  const [newMessage, setNewMessage] = useState('');
   const messageContainerRef = useRef(null);
 
-  const handleSendMessage = () => {
-    const newMessage = {
-      username: 'CurrentUser',
-      content: 'New message content',
-      timestamp: new Date(),
-    };
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
+  };
 
-    setMessages([newMessage, ...messages]);
+  const handleSendMessage = () => {
+    if (newMessage.trim() !== '') {
+      const message = {
+        username: 'CurrentUser',
+        content: newMessage,
+        timestamp: new Date(),
+      };
+
+      setMessages([message, ...messages]);
+      setNewMessage('');
+    }
   };
 
   useEffect(() => {
@@ -30,25 +37,31 @@ const UserChat = () => {
 
   return (
     <div>
-      <div
-        ref={messageContainerRef}
-        style={{
-          height: '400px',
-          overflowY: 'scroll',
-          border: '1px solid #ccc',
-          padding: '10px',
-          borderRadius: '8px',
-          marginBottom: '10px',
-        }}
-      >
-        {[...messages].reverse().map((message) => (
-          <Message key={message.username} {...message} />
-        ))}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-        <input type="text" placeholder="Type your message..." style={{ marginBottom: '10px' }} />
-        <button onClick={handleSendMessage}>Send Message</button>
-      </div>
+        <div
+            ref={messageContainerRef}
+            style={{
+            height: '400px',
+            overflowY: 'scroll',
+            border: '1px solid #ccc',
+            padding: '10px',
+            borderRadius: '8px',
+            marginBottom: '10px',
+            }}
+        >
+            {[...messages].reverse().map((message) => (
+            <Message key={message.username} {...message} />
+            ))}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <input
+                type="text"
+                placeholder="Type your message..."
+                value={newMessage}
+                onChange={handleInputChange}
+                style={{ borderRadius: '5px', marginBottom: '10px', width: '600px', padding: '8px' }}
+            />
+            <button onClick={handleSendMessage}>Send</button>
+        </div>
     </div>
   );
 };

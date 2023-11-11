@@ -1,8 +1,10 @@
 import { Link, useParams } from "react-router-dom"
 import {Sidebar,SidebarGroup,SidebarElement} from "../components/Sidebar"
+import {Tabs} from "../components/Tabs"
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
+
 
 const test = {
     data: [
@@ -54,7 +56,7 @@ const test = {
     ]
   }
 
-const SERVER_API = "https://localhost:7217/api"
+const SERVER_API = "http://localhost:5000/api"
 
 const Dummy = () => {
     const {"*": currentPath} = useParams()
@@ -121,10 +123,17 @@ const Dummy = () => {
 
     return(
         <>
-            <div className="d-flex flex-column" style={{height: "100%"}}>
-                <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={(path) => {setPath(path)}} activeLink={path} basePath={""}/>
-                
+            <div className="d-flex" style={{ height: "100%" }}>
+                <div>
+                    <div className="d-flex flex-column" style={{ height: "100%" }}>
+                    <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
+                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={(path) => {setPath(path)}} activeLink={path} basePath={""}/>
+                    </div>
+                </div>
+
+                <div className="flex-grow-1">
+                    <Tabs />
+                </div>
             </div>
         </>
     )

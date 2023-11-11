@@ -5,11 +5,11 @@ const Message = ({ username, content, timestamp }) => {
     <div style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ccc', borderRadius: '8px' }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
         <strong>{username}</strong>
-        <small style={{ fontSize: '10px' }}>{timestamp.toLocaleString()}</small>
+        <small style={{ marginLeft: '4px', fontSize: '10px' }}>{timestamp.toLocaleString()}</small>
       </div>
-      <p>{content}</p>
+      <p style={{ wordWrap: 'break-word' }}>{content}</p>
     </div>
   );
 };
 
-export {Message};
+export { Message };

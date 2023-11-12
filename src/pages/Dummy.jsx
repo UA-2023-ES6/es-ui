@@ -59,32 +59,33 @@ const test = {
 const SERVER_API = "http://localhost:5000/api"
 
 const Dummy = () => {
-    const {"*": currentPath} = useParams()
-    const [groupName,setGroupName] = useState("")
-    const [path,setPath] = useState("/" + test.name)
-    const [sidebarContent,setSidebarContent] = useState([])
-    //test.groups[0].groups = sidebarContent
+    const {"*": currentPath} = useParams();
+    const [groupName, setGroupName] = useState("");
+    const [path, setPath] = useState("/" + test.name);
+    const [sidebarContent, setSidebarContent] = useState([]);
+    const [id, setGroupID] = useState(-1);
+    const [show, setShow] = useState(false);
+    const [pathIdMapping, setPathIdMapping] = useState({});
+    const [selectedId, setSelectedId] = useState(1);
 
-    //const [updateFlag,setUpdateFlag] = useState(false)
-    const [id,setGroupID] = useState(-1)
+    const handleClose = () => setShow(false);
 
-    const [show,setShow] = useState(false)
-    const handleClose = () => setShow(false)
-    const handleShow = (id) => { 
-        setGroupID(id)
-        setShow(true) 
-    }
+    const handleShow = (id) => {
+        setGroupID(id);
+        setShow(true);
+    };
 
-    const handleChange = (e) => setGroupName(e.target.value)
+    const handleChange = (e) => setGroupName(e.target.value);
+
     const handleCreate = () => {
-        console.log(groupName)
+        //console.log("Groupname:",groupName)
         const data = {
             name: groupName,
             parentGroupId: id
         }
 
         const t = JSON.stringify(data)
-        console.log(t)
+        //console.log(t)
 
         fetch(`${SERVER_API}/Group`,{
             method: "POST",
@@ -94,16 +95,29 @@ const Dummy = () => {
             },
             body: t
         }).catch(err => console.log(err))
-        handleClose()
+        setSelectedId(1);
+        handleClose();
     }
+
+    const onElementClick = (path) => {
+        //console.log("path:",path)
+        setPath(path);
+        setSelectedId(pathIdMapping[path.substring(1)]);
+        //console.log("pathIdMapping:",pathIdMapping)
+        //console.log("pathIdMapping[path]:",pathIdMapping[path.substring(1)])
+        //console.log("selectedId:",selectedId)
+    };
+      
 
 
     useEffect(() => {
-        getGroups().then((data) => {
-            setSidebarContent(data)
+        getGroups(setPathIdMapping).then((data) => {
+            setSidebarContent(data);
+            setPathIdMapping(buildPathIdMapping(data));
         })
     },[])
 
+    
     if(currentPath === "") {
         return(
             <>
@@ -127,22 +141,28 @@ const Dummy = () => {
                 <div>
                     <div className="d-flex flex-column" style={{ height: "100%" }}>
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={(path) => {setPath(path)}} activeLink={path} basePath={""}/>
+                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""}/>
                     </div>
                 </div>
 
                 <div className="flex-grow-1">
-                    <Tabs />
+                    <Tabs id={selectedId} />
                 </div>
             </div>
         </>
     )
 }
 
-async function getGroups() {
+async function getGroups(setPathIdMapping) {
     try{
         const response = await fetch(`${SERVER_API}/Group?Take=100&Skip=0`)
         const data = await response.json()
+        //console.log("getGroups:",data)
+        //console.log("map:",map)
+
+        const mapping = buildPathIdMapping(data.data);
+        setPathIdMapping(mapping);
+
         return data.data
     }
     catch {
@@ -180,12 +200,32 @@ function SidebarContent({content,onAddClick,parentPath,onElementClick,activeLink
             </SidebarElement>
         </>
     }
-
     return(
         <>
             {innerContent}
         </>
     )
+}
+
+function buildPathIdMapping(data, basePath = "") {
+    const mapping = {};
+    
+    function traverse(group, path) {
+      const currentPath = path === "" ? group.name : `${path}/${group.name}`;
+      mapping[currentPath] = group.id;
+  
+      if (group.subGroup && group.subGroup.length > 0) {
+        group.subGroup.forEach((subGroup) => {
+          traverse(subGroup, currentPath);
+        });
+      }
+    }
+  
+    data.forEach((group) => {
+      traverse(group, basePath);
+    });
+  
+    return mapping;
 }
 
 function CreateGroupModal({show,handleClose,onNameChange,onCreate}) {

@@ -9,9 +9,9 @@ import {
 import "../styles/tabs.css";
 import { UserChat } from "./UserChat"
 
-const Tabs = () => {
+const Tabs = ({id}) => {
   const [activeTab, setActiveTab] = useState('tab1');
-
+  //console.log(selected_id)
   const handleTabClick = (value) => {
     if (value === activeTab) {
       return;
@@ -37,7 +37,7 @@ const Tabs = () => {
 
       <MDBTabsContent>
         <MDBTabsPane open={activeTab === 'tab1'}>
-          <UserChat />
+          <UserChat id={id}/>
         </MDBTabsPane>
         <MDBTabsPane open={activeTab === 'tab2'}>
           Insert events

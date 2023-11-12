@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Message } from './Message';
 import send_message_icon from "../imgs/UserChat/send_message_icon.png";
 
-const UserChat = () => {
+const SERVER_API = "http://localhost:5000/api"
+
+const UserChat = ({id}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const messageContainerRef = useRef(null);
@@ -11,18 +13,44 @@ const UserChat = () => {
     setNewMessage(e.target.value);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim() !== '') {
       const message = {
-        username: 'CurrentUser',
-        content: newMessage,
-        timestamp: new Date(),
+        "content": newMessage,
+        "groupId": id,
+        "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
       };
-
-      setMessages([message, ...messages]);
-      setNewMessage('');
+  
+      try {
+        const response = await fetch(`${SERVER_API}/Message`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(message),
+        });
+  
+        if (response.ok) {
+          try {
+            const response = await fetch(`${SERVER_API}/Message/group/${id}`);
+            const data = await response.json();
+            const all_messages = extractContent(data)
+            //console.log("all_messages:",all_messages)
+            setMessages(all_messages);
+          } catch (error) {
+            console.error('Error fetching initial messages:', error);
+          }
+          setNewMessage('');
+          //console.log("All messages:",messages)
+        } else {
+          console.error('Failed to send message. Server responded with:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
     }
   };
+  
 
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -30,21 +58,30 @@ const UserChat = () => {
     }
   }, [messages]); 
 
-  /*
-  useEffect(() => {
-    const fetchInitialMessages = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/endpoint');
-        const data = await response.json();
-        setMessages(data.messages);
-      } catch (error) {
-        console.error('Error fetching initial messages:', error);
-      }
-    };
+  const fetchNewMessages = async () => {
+    try {
+      const response = await fetch(`${SERVER_API}/Message/group/${id}`);
+      const data = await response.json();
+      const newMessages = extractContent(data);
+      setMessages(newMessages);
+    } catch (error) {
+      console.error('Error fetching new messages:', error);
+    }
+  };
 
-    fetchInitialMessages();
-  }, []);
-  */
+  useEffect(() => {
+    fetchNewMessages();
+  }, [id]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchNewMessages();
+    }, 200);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [id]);
 
 
   useEffect(() => {
@@ -69,8 +106,8 @@ const UserChat = () => {
                 marginBottom: '10px',
             }}
             >
-            {[...messages].reverse().map((message) => (
-                <Message key={message.username} {...message} />
+            {[...messages].map((message) => (
+                <Message key={message.messageId} {...message} />
             ))}
         </div>
 
@@ -116,5 +153,14 @@ const UserChat = () => {
     </div>
   );
 };
+
+function extractContent(json) {
+  return json.data.map(item => ({
+    messageId: item.id,
+    content: item.content,
+    createDate: new Date(item.createDate),
+    username: item.senderName
+  }));
+}
 
 export { UserChat };

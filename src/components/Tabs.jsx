@@ -22,13 +22,13 @@ const Tabs = () => {
 
   return (
     <>
-      <MDBTabs pills justify className='mb-3 custom-tabs'>
-        <MDBTabsItem className='custom-tabs-item'>
+      <MDBTabs pills justify className='custom-tabs' >
+        <MDBTabsItem className='custom-tabs-item' style={{borderBottom: '1px solid #ccc', borderLeft: '1px solid #ccc', borderRight: '1px solid #ccc'}}>
           <MDBTabsLink onClick={() => handleTabClick('tab1')} active={activeTab === 'tab1'} className='custom-tabs-link'>
             Messages
           </MDBTabsLink>
         </MDBTabsItem>
-        <MDBTabsItem className='custom-tabs-item'>
+        <MDBTabsItem className='custom-tabs-item' style={{borderBottom: '1px solid #ccc', borderRight: '1px solid #ccc'}}>
           <MDBTabsLink onClick={() => handleTabClick('tab2')} active={activeTab === 'tab2'} className='custom-tabs-link'>
             Events
           </MDBTabsLink>

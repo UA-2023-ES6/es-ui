@@ -15,4 +15,26 @@
     background-color: #f8f9fa;
     color: #000000;
 }
+
+/*Scroll css - for Firefox */
+
+* {
+    scrollbar-color: #ccc #f1f1f1; /* thumb and track color */
+    scrollbar-width: thin; /* scrollbar width */
+}
+
+/*Scroll css - for Chrome and Safari */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 5px;
+}
+  
+::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
   

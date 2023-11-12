@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Message } from './Message';
+import send_message_icon from "../imgs/UserChat/send_message_icon.png";
 
 const UserChat = () => {
   const [messages, setMessages] = useState([]);
@@ -57,11 +58,14 @@ const UserChat = () => {
         <div
             ref={messageContainerRef}
             style={{
-                height: '400px',
+                height: '70vh', // if there are any vertical scroll appearing without need set this to 500px
                 overflowY: 'scroll',
-                border: '1px solid #ccc',
+                borderLeft: '1px solid #ccc',
+                borderBottom: '1px solid #ccc',
+                borderRight: '1px solid #ccc',
                 padding: '10px',
-                borderRadius: '8px',
+                borderBottomLeftRadius: '8px',
+                borderBottomRightRadius: '8px',
                 marginBottom: '10px',
             }}
             >
@@ -71,31 +75,43 @@ const UserChat = () => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+          <div style={{ position: 'relative', width: '600px' }}>
             <textarea
-                placeholder="Type your message..."
-                value={newMessage}
-                onChange={handleInputChange}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                    }
-                }}
-                style={{
-                    borderRadius: '5px',
-                    marginBottom: '10px',
-                    width: '600px',
-                    height: '43px',
-                    padding: '8px',
-                    resize: 'none',
-                    whiteSpace: 'pre-wrap', // Preserve newline characters
-                    wordBreak: 'break-word', // Ensure long words break
-                }}
+              placeholder="Type your message..."
+              value={newMessage}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              style={{
+                borderRadius: '5px',
+                width: '100%',
+                height: '37px',
+                paddingLeft: '8px',
+                resize: 'none',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                marginTop: '5px'
+              }}
             />
-            <button onClick={handleSendMessage} style={{ cursor: 'pointer' }}>
-                Send
-            </button>
+            <img
+              src={send_message_icon} // Replace with your image source
+              alt="Send"
+              style={{
+                cursor: 'pointer',
+                position: 'absolute',
+                right: -50,
+                bottom: '50%',
+                transform: 'translateY(50%)',
+              }}
+              onClick={handleSendMessage}
+            />
+          </div>
         </div>
+
 
     </div>
   );

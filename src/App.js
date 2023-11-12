@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Dummy from "./pages/Dummy";
+import { Account } from "./components/Account";
 import LoginPage from "./pages/LoginPage";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
@@ -15,6 +16,9 @@ import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
+
+    const [loggedIn,setLoggedIn] = useState(false)
+
     const userGroups = [
         "grupo 1",
         "grupo 2",
@@ -50,12 +54,13 @@ function App() {
     return(
         <>
         <div className="d-flex flex-column" style={{height: "100vh"}}>
+            <Account>
                 <BrowserRouter>
-                    <Header userGroups={userGroups}/>
+                    <Header userGroups={userGroups} isLoggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
                     <div style={{flex: "1"}}>
                         <Routes>
                             <Route path="/" element={<MainPage />}/>
-                            <Route path="/login" element={<LoginPage />}/>
+                            <Route path="/auth" element={<LoginPage setLoggedIn={setLoggedIn} />}/>
                             <Route path="/home" element={<UserHomePage userGroups={userGroups}/>}/>
                             <Route path="/groupName" element={<UserGroupPage />}/>
                             <Route path="/serverTime" element={<ServerTime />} />
@@ -64,7 +69,8 @@ function App() {
                         </Routes>
                     </div>
                 </BrowserRouter>
-            <Footer />
+                <Footer />
+            </Account>
         </div>
         </>
     )

@@ -1,8 +1,10 @@
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, useLocation } from "react-router-dom"
 import {Sidebar,SidebarGroupHeader,SidebarElement} from "../components/Sidebar"
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
+
+import SuccessMessage from '../components/SuccessMessage'
 
 const test = {
     id: 1,
@@ -54,7 +56,11 @@ const test = {
 
 const SERVER_API = "https://localhost:7217/api"
 
-const Dummy = () => {
+const Dummy = (props) => {
+
+    const {state} = useLocation()
+    const { success } = state || { success: "" }    
+
     const {"*": currentPath} = useParams()
     const [groupName,setGroupName] = useState("")
     const [path,setPath] = useState("/" + test.name)
@@ -115,9 +121,14 @@ const Dummy = () => {
 
     return(
         <>
-            <div className="d-flex flex-column" style={{height: "100%"}}>
-                <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                <MySidebar content={test} onAddClick={handleShow} onElementClick={(path) => {setPath(path)}} activeLink={path} basePath={""}/>
+            <div className="d-flex" style={{height: "100%"}}>
+                <div className="d-flex flex-column">
+                    <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
+                    <MySidebar content={test} onAddClick={handleShow} onElementClick={(path) => {setPath(path)}} activeLink={path} basePath={""}/>
+                </div>
+                <div className="p-3 my-5 d-flex flex-column w-50">
+                    {success ? <SuccessMessage message={success}/> : null}  
+                </div>
             </div>
         </>
     )

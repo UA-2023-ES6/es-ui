@@ -45,7 +45,7 @@ const MainPage = () => {
                                     </div>
                                 </div>
                                 <div className="d-flex justify-content-center mb-5">
-                                    <Link to="/login" className="btn btn-primary">Login to your institution</Link>
+                                    <Link to="/auth" className="btn btn-primary">Login to your institution</Link>
                                 </div>
                             </div>
                         </div>

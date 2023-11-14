@@ -5,12 +5,13 @@ import bannerImg from "../imgs/MainPage/banner.png"
 import lonelyStudent from "../imgs/MainPage/lonely_student.svg"
 import groupStudents from "../imgs/MainPage/group_students.jpg"
 import partyStudents from "../imgs/MainPage/party_students.svg"
+import { Link } from "react-router-dom"
 
 const MainPage = () => {
     return(
         <>
-            <Banner text="Don't study alone anymore" imgSrc={bannerImg}/>
             <div className="p-5">
+                <Banner text="Don't study alone anymore" imgSrc={bannerImg} />
                 <CenteredContent>
                     <div className="p-5">
                         <h2 className="fw-bold text-center">We help institutions reach out to their students</h2>
@@ -38,13 +39,13 @@ const MainPage = () => {
                                 <div className="d-flex justify-content-center">
                                     <div className="w-75">
                                         <p className="fs-5 text-wrap text-center">
-                                            With {"<project name>"} you icebreak and socialize easily with other people in your classes, help others, meet new people, stay up-to-date on
+                                            With {"OneCampus"} you icebreak and socialize easily with other people in your classes, help others, meet new people, stay up-to-date on
                                             the events of your institution and more...
                                         </p>
                                     </div>
                                 </div>
                                 <div className="d-flex justify-content-center mb-5">
-                                    <button type="button" className="btn btn-primary">LogIn to your institution</button>
+                                    <Link to="/auth" className="btn btn-primary">Login to your institution</Link>
                                 </div>
                             </div>
                         </div>

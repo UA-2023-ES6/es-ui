@@ -7,31 +7,70 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Dummy from "./pages/Dummy";
+import { Account } from "./components/Account";
+import LoginPage from "./pages/LoginPage";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
+
+    const [loggedIn,setLoggedIn] = useState(false)
+
     const userGroups = [
         "grupo 1",
         "grupo 2",
         "grupo 3",
         "grupo 4"
     ]
+
+    const [isLoggedIn, setlogIn] = useState(false);
+    console.log("login status: ", isLoggedIn);
+
+    if(Cookies.get('login') == undefined){
+        Cookies.set('login', JSON.stringify(false));
+    }
+
+    useEffect(() => {
+        const loginCookie = Cookies.get('login');
+        if (loginCookie === JSON.stringify(true)) {
+            setlogIn(true);
+        }
+    }, []);
+
+    const doLogin = () => {
+        if (isLoggedIn) {
+            setlogIn(false);
+            Cookies.set('login', JSON.stringify(false));
+            window.location.reload();
+        } else {
+            setlogIn(true);
+            Cookies.set('login', JSON.stringify(true));
+        }
+    };
+
     return(
         <>
         <div className="d-flex flex-column" style={{height: "100vh"}}>
-            <Header userGroups={userGroups}/>
-            <div style={{flex: "1"}}>
+            <Account>
                 <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<MainPage />}/>
-                        <Route path="/home" element={<UserHomePage userGroups={userGroups}/>}/>
-                        <Route path="/groupName" element={<UserGroupPage />}/>
-                        <Route path="/serverTime" element={<ServerTime />} />
-                        <Route path="/dummy/*" element={<Dummy />} />
-                        <Route path="*" element={<NoPage />} />
-                    </Routes>
+                    <Header userGroups={userGroups} isLoggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
+                    <div style={{flex: "1"}}>
+                        <Routes>
+                            <Route path="/" element={<MainPage />}/>
+                            <Route path="/auth" element={<LoginPage setLoggedIn={setLoggedIn} />}/>
+                            <Route path="/home" element={<UserHomePage userGroups={userGroups}/>}/>
+                            <Route path="/groupName" element={<UserGroupPage />}/>
+                            <Route path="/serverTime" element={<ServerTime />} />
+                            <Route path="/dummy/*" element={<Dummy />} />
+                            <Route path="*" element={<NoPage />} />
+                        </Routes>
+                    </div>
                 </BrowserRouter>
-            </div>
-            <Footer />
+                <Footer />
+            </Account>
         </div>
         </>
     )

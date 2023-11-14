@@ -1,10 +1,11 @@
-import { Link, useParams } from "react-router-dom"
 import {Sidebar,SidebarGroup,SidebarElement} from "../components/Sidebar"
 import {Tabs} from "../components/Tabs"
+import { Link, useParams, useLocation } from "react-router-dom"
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
 
+import SuccessMessage from '../components/SuccessMessage'
 
 const test = {
     data: [
@@ -59,6 +60,10 @@ const test = {
 const SERVER_API = "http://localhost:5000/api"
 
 const Dummy = () => {
+  
+    const {state} = useLocation()
+    const { success } = state || { success: "" }    
+    
     const {"*": currentPath} = useParams();
     const [groupName, setGroupName] = useState("");
     const [path, setPath] = useState("/" + test.name);
@@ -144,7 +149,8 @@ const Dummy = () => {
                     <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""}/>
                     </div>
                 </div>
-
+                <div className="p-3 my-5 d-flex flex-column w-50">
+                    {success ? <SuccessMessage message={success}/> : null}  
                 <div className="flex-grow-1">
                     <Tabs id={selectedId} />
                 </div>

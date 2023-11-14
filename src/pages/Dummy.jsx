@@ -62,7 +62,10 @@ const SERVER_API = "http://localhost:5000/api"
 const Dummy = () => {
   
     const {state} = useLocation()
-    const { success } = state || { success: "" }    
+    
+    const [success] = useState(state ? state.success : null)
+
+    window.history.replaceState(null, "", "/dummy" + window.location.pathname); //remove the state to prevent the success message from showing up again on refresh
     
     const {"*": currentPath} = useParams();
     const [groupName, setGroupName] = useState("");
@@ -142,17 +145,13 @@ const Dummy = () => {
 
     return(
         <>
-            <div className="d-flex" style={{ height: "100%" }}>
-                <div>
-                    <div className="d-flex flex-column" style={{ height: "100%" }}>
+            <div className="d-flex" style={{height: "100%"}}>
+                <div className="d-flex flex-column">
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
                     <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""}/>
-                    </div>
-                    <div className="p-3 my-5 d-flex flex-column w-50">
-                        {success ? <SuccessMessage message={success}/> : null}
-                    </div>
                 </div>
                 <div className="flex-grow-1">
+                    {success ? <SuccessMessage message={success}/> : null}
                     <Tabs id={selectedId} />
                 </div>
             </div>

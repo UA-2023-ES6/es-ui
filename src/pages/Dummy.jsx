@@ -148,9 +148,10 @@ const Dummy = () => {
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
                     <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""}/>
                     </div>
+                    <div className="p-3 my-5 d-flex flex-column w-50">
+                        {success ? <SuccessMessage message={success}/> : null}
+                    </div>
                 </div>
-                <div className="p-3 my-5 d-flex flex-column w-50">
-                    {success ? <SuccessMessage message={success}/> : null}  
                 <div className="flex-grow-1">
                     <Tabs id={selectedId} />
                 </div>

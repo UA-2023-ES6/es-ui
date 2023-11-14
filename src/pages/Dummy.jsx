@@ -1,5 +1,6 @@
+import {Sidebar,SidebarGroup,SidebarElement} from "../components/Sidebar"
+import {Tabs} from "../components/Tabs"
 import { Link, useParams, useLocation } from "react-router-dom"
-import {Sidebar,SidebarGroupHeader,SidebarElement} from "../components/Sidebar"
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
@@ -7,81 +8,89 @@ import { useEffect, useState } from 'react'
 import SuccessMessage from '../components/SuccessMessage'
 
 const test = {
-    id: 1,
-    name: "UA",
-    groups:
-    [
-        {
-            id: 1,
-            name:"turma1",
-            groups:
-            [
-                // {
-                // id: 1,
-                // name: "grupo1",
-                // usersIds: [
-                //     {
-                //     id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                //     name: "user1",
-                //     email: "user1@mail.com"
-                //     }
-                // ]
-                // },
-                // {
-                //     id: 2,
-                //     name: "grupo2",
-                //     usersIds: [
-                //     {
-                //         id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                //         name: "user1",
-                //         email: "user1@mail.com"
-                //     }
-                //     ]
-                // },
-                // {
-                //     id: 3,
-                //     name: "grupo3",
-                //     usersIds: [
-                //     {
-                //         id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                //         name: "user1",
-                //         email: "user1@mail.com"
-                //     }
-                //     ]
-                // }
-            ] 
-        }
+    data: [
+      {
+        id: 1,
+        name: "Default Institution",
+        usersIds: [],
+        subGroup: [
+          {
+            id: 2,
+            name: "5",
+            usersIds: [],
+            subGroup: [
+              {
+                id: 3,
+                name: "Group 1.1",
+                usersIds: [],
+                subGroup: [
+                  {
+                    id: 4,
+                    name: "Group 1.1.1",
+                    usersIds: [],
+                    subGroup: []
+                  },
+                  {
+                    id: 7,
+                    name: "5",
+                    usersIds: [],
+                    subGroup: []
+                  }
+                ]
+              },
+              {
+                id: 5,
+                name: "Group 1.2",
+                usersIds: [],
+                subGroup: []
+              }
+            ]
+          },
+          {
+            id: 6,
+            name: "Group 2",
+            usersIds: [],
+            subGroup: []
+          }
+        ]
+      }
     ]
-}
+  }
 
-const SERVER_API = "https://localhost:7217/api"
+const SERVER_API = "http://localhost:5000/api"
 
-const Dummy = (props) => {
-
+const Dummy = () => {
+  
     const {state} = useLocation()
     const { success } = state || { success: "" }    
+    
+    const {"*": currentPath} = useParams();
+    const [groupName, setGroupName] = useState("");
+    const [path, setPath] = useState("/" + test.name);
+    const [sidebarContent, setSidebarContent] = useState([]);
+    const [id, setGroupID] = useState(-1);
+    const [show, setShow] = useState(false);
+    const [pathIdMapping, setPathIdMapping] = useState({});
+    const [selectedId, setSelectedId] = useState(1);
 
-    const {"*": currentPath} = useParams()
-    const [groupName,setGroupName] = useState("")
-    const [path,setPath] = useState("/" + test.name)
-    const [sidebarContent,setSidebarContent] = useState([])
-    test.groups[0].groups = sidebarContent
+    const handleClose = () => setShow(false);
 
-    const [updateFlag,setUpdateFlag] = useState(false)
+    const handleShow = (id) => {
+        setGroupID(id);
+        setShow(true);
+    };
 
-    const [show,setShow] = useState(false)
-    const handleClose = () => setShow(false)
-    const handleShow = () => setShow(true)
-    const handleChange = (e) => setGroupName(e.target.value)
+    const handleChange = (e) => setGroupName(e.target.value);
+
     const handleCreate = () => {
-        console.log(groupName)
+        //console.log("Groupname:",groupName)
         const data = {
             name: groupName,
-            classId: 1
+            parentGroupId: id
         }
 
         const t = JSON.stringify(data)
-        console.log(t)
+        //console.log(t)
 
         fetch(`${SERVER_API}/Group`,{
             method: "POST",
@@ -90,18 +99,30 @@ const Dummy = (props) => {
                 "Content-Type": "application/json"
             },
             body: t
-        })
-        handleClose()
-        setUpdateFlag(!updateFlag)
+        }).catch(err => console.log(err))
+        setSelectedId(1);
+        handleClose();
     }
+
+    const onElementClick = (path) => {
+        //console.log("path:",path)
+        setPath(path);
+        setSelectedId(pathIdMapping[path.substring(1)]);
+        //console.log("pathIdMapping:",pathIdMapping)
+        //console.log("pathIdMapping[path]:",pathIdMapping[path.substring(1)])
+        //console.log("selectedId:",selectedId)
+    };
+      
 
 
     useEffect(() => {
-        getGroups().then((data) => {
-            setSidebarContent(data)
+        getGroups(setPathIdMapping).then((data) => {
+            setSidebarContent(data);
+            setPathIdMapping(buildPathIdMapping(data));
         })
-    },[updateFlag])
+    },[])
 
+    
     if(currentPath === "") {
         return(
             <>
@@ -121,23 +142,33 @@ const Dummy = (props) => {
 
     return(
         <>
-            <div className="d-flex" style={{height: "100%"}}>
-                <div className="d-flex flex-column">
+            <div className="d-flex" style={{ height: "100%" }}>
+                <div>
+                    <div className="d-flex flex-column" style={{ height: "100%" }}>
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                    <MySidebar content={test} onAddClick={handleShow} onElementClick={(path) => {setPath(path)}} activeLink={path} basePath={""}/>
+                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""}/>
+                    </div>
                 </div>
                 <div className="p-3 my-5 d-flex flex-column w-50">
                     {success ? <SuccessMessage message={success}/> : null}  
+                <div className="flex-grow-1">
+                    <Tabs id={selectedId} />
                 </div>
             </div>
         </>
     )
 }
 
-async function getGroups() {
+async function getGroups(setPathIdMapping) {
     try{
         const response = await fetch(`${SERVER_API}/Group?Take=100&Skip=0`)
         const data = await response.json()
+        //console.log("getGroups:",data)
+        //console.log("map:",map)
+
+        const mapping = buildPathIdMapping(data.data);
+        setPathIdMapping(mapping);
+
         return data.data
     }
     catch {
@@ -149,36 +180,58 @@ async function getGroups() {
 function MySidebar({content,onAddClick,onElementClick,activeLink,basePath}) {
     return(
         <Sidebar>
-            <SidebarContent content={content} onAddClick={onAddClick} onElementClick={onElementClick} activeLink={activeLink} parentPath={basePath}/>
+            {content.map((institution) => <SidebarContent key={institution.name} content={institution} onAddClick={onAddClick} onElementClick={onElementClick} activeLink={activeLink} parentPath={basePath}/> )}
         </Sidebar>
     )
 }
 
-function SidebarContent({content,onAddClick,parentPath,onElementClick,activeLink,innerLevel=1}) {
+function SidebarContent({content,onAddClick,parentPath,onElementClick,activeLink}) {
     var innerContent = ""
     const path = parentPath + "/" + content.name
-    if(content.constructor === Object && "groups" in content) {
+    if(content.constructor === Object && "subGroup" in content && content.subGroup.length > 0) {
         innerContent = <>
-            <SidebarGroupHeader header={<Header title={content.name} onAddClick={onAddClick} activeLink={activeLink} onElementClick={onElementClick} path={path} innerLevel={innerLevel}/>} headerKey={content.name}>
-                {
-                    content.groups.map((group) => {return <SidebarContent key={group.name} content={group} onAddClick={onAddClick} parentPath={path} onElementClick={onElementClick} innerLevel={innerLevel+1} activeLink={activeLink}/>})
-                }
-            </SidebarGroupHeader>
+            <SidebarGroup>
+                <Group title={content.name} onAddClick={onAddClick} activeLink={activeLink} onElementClick={onElementClick} path={path} id={content.id} headerKey={"g" + content.id}>
+                    {
+                        content.subGroup.map((group) => {return <SidebarContent key={group.name} content={group} onAddClick={onAddClick} parentPath={path} onElementClick={onElementClick} activeLink={activeLink}/>})
+                    }
+                </Group>
+            </SidebarGroup>
         </>
     }
     else {
         innerContent = <>
             <SidebarElement>
-                <LinkElement name={content.name} activeLink={activeLink} onAddClick={onAddClick} path={path} onElementClick={onElementClick} innerLevel={innerLevel}/>
+                <LinkElement name={content.name} activeLink={activeLink} onAddClick={onAddClick} path={path} onElementClick={onElementClick} id={content.id}/>
             </SidebarElement>
         </>
     }
-
     return(
         <>
             {innerContent}
         </>
     )
+}
+
+function buildPathIdMapping(data, basePath = "") {
+    const mapping = {};
+    
+    function traverse(group, path) {
+      const currentPath = path === "" ? group.name : `${path}/${group.name}`;
+      mapping[currentPath] = group.id;
+  
+      if (group.subGroup && group.subGroup.length > 0) {
+        group.subGroup.forEach((subGroup) => {
+          traverse(subGroup, currentPath);
+        });
+      }
+    }
+  
+    data.forEach((group) => {
+      traverse(group, basePath);
+    });
+  
+    return mapping;
 }
 
 function CreateGroupModal({show,handleClose,onNameChange,onCreate}) {
@@ -210,25 +263,32 @@ function CreateGroupModal({show,handleClose,onNameChange,onCreate}) {
 }
 
 //sidebar helper functions
-function Header({title,onAddClick,activeLink,onElementClick,path,innerLevel}) {
+function Group({title,onAddClick,activeLink,onElementClick,path,id,headerKey,children}) {
     return(
-        <div className="d-flex add-btn-group align-items-center">
-            <div className="d-flex align-items-center" style={{flex: "1"}}>
-                <button className="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target={"#" + title.replace(/\s/g, "") + "-collapse"} aria-expanded="true"/>
-                <LinkButton name={title} activeLink={activeLink} onElementClick={onElementClick} path={path}/>
+        <>
+            <div className="d-flex add-btn-group align-items-center">
+                <div className="d-flex align-items-center" style={{flex: "1"}}>
+                    <button className="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target={"#" + headerKey + "-collapse"} aria-expanded="true"/>
+                    <LinkButton name={title} activeLink={activeLink} onElementClick={onElementClick} path={path}/>
+                </div>
+                <AddBtn onClick={onAddClick} id={id}/>
             </div>
-            {innerLevel === 2 ? <AddBtn onClick={onAddClick} /> : ""}
-        </div>
+            <div className="collapse show" style={{paddingLeft: "2rem"}} id={headerKey + "-collapse"}>
+                <ul className="btn-toggle-nav list-unstyled">
+                    {children}
+                </ul>
+            </div>
+        </>
     )
 }
 
-function LinkElement({activeLink,name,onAddClick,path,onElementClick,innerLevel}) {
+function LinkElement({activeLink,name,onAddClick,path,onElementClick,id}) {
     return(
         <div className="d-flex add-btn-group align-items-center">
             <div style={{flex: "1"}}>
                 <LinkButton name={name} activeLink={activeLink} path={path} onElementClick={onElementClick}/>
             </div>
-            {innerLevel === 2 ? <AddBtn onClick={onAddClick} /> : ""}
+            <AddBtn onClick={onAddClick} id={id}/>
         </div>
     )
 }
@@ -242,9 +302,9 @@ function LinkButton({name,activeLink,path,onElementClick}) {
     )
 }
 
-function AddBtn({onClick}) {
+function AddBtn({onClick,id}) {
     return(
-        <button className="btn add-btn" onClick={onClick}/>
+        <button className="btn add-btn" onClick={() => {onClick(id)}}/>
     )
 }
 

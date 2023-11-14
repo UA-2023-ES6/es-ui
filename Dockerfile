@@ -10,6 +10,9 @@ COPY package*.json ./
 # Remove the node_modules folder if it exists
 RUN rm -rf node_modules
 
+# Remove the package-lock.json file if it exists
+RUN rm -f package-lock.json
+
 # Install Node.js dependencies
 RUN npm install
 

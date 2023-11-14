@@ -94,7 +94,7 @@ function LoginPage({setLoggedIn}) {
 
       <MDBTabsContent>
 
-        <MDBTabsPane show={justifyActive === 'tab1'}>
+        <MDBTabsPane open={justifyActive === 'tab1' ? 1 : 0}>
 
           <MDBInput wrapperClass='mb-4' label='Email' id='form1' type='email' value={email} onChange={(event) => setEmail(event.target.value)}/>
           <MDBInput wrapperClass='mb-4' label='Password' id='form2' type='password' value={password} onChange={(event) => setPassword(event.target.value)}/>
@@ -106,7 +106,7 @@ function LoginPage({setLoggedIn}) {
 
         </MDBTabsPane>
 
-        <MDBTabsPane show={justifyActive === 'tab2'}>
+        <MDBTabsPane open={justifyActive === 'tab2' ? 1 : 0}>
             
           <MDBInput wrapperClass='mb-4' label='Username' id='form1' type='text' value={username} onChange={(event) => setUsername(event.target.value)} />
           <MDBInput wrapperClass='mb-4' label='Email' id='form1' type='email' value={email} onChange={(event) => setEmail(event.target.value)} />

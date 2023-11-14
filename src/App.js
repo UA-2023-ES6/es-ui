@@ -10,7 +10,6 @@ import Dummy from "./pages/Dummy";
 import { Account } from "./components/Account";
 import LoginPage from "./pages/LoginPage";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -25,31 +24,6 @@ function App() {
         "grupo 3",
         "grupo 4"
     ]
-
-    const [isLoggedIn, setlogIn] = useState(false);
-    console.log("login status: ", isLoggedIn);
-
-    if(Cookies.get('login') == undefined){
-        Cookies.set('login', JSON.stringify(false));
-    }
-
-    useEffect(() => {
-        const loginCookie = Cookies.get('login');
-        if (loginCookie === JSON.stringify(true)) {
-            setlogIn(true);
-        }
-    }, []);
-
-    const doLogin = () => {
-        if (isLoggedIn) {
-            setlogIn(false);
-            Cookies.set('login', JSON.stringify(false));
-            window.location.reload();
-        } else {
-            setlogIn(true);
-            Cookies.set('login', JSON.stringify(true));
-        }
-    };
 
     return(
         <>

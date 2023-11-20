@@ -50,7 +50,7 @@ function LoginPage({setLoggedIn}) {
 
   const signUp = (event) => {
     event.preventDefault()
-    userPool.signUp(email,password,[],null, (err,data) => {
+    userPool.signUp(email,password,[{"Name":"custom:username","Value":username}],null, (err,data) => {
         if(err){
             console.error(err)
             setError(err.message)

@@ -131,7 +131,7 @@ const UserChat = ({id}) => {
                 resize: 'none',
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
-                marginTop: '5px'
+                marginTop: '0px'
               }}
             />
             <img

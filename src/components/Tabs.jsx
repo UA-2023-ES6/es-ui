@@ -8,6 +8,7 @@ import {
 } from 'mdb-react-ui-kit';
 import "../styles/tabs.css";
 import { UserChat } from "./UserChat"
+import { Forum } from "./Forum"
 
 const Tabs = ({id}) => {
   const [activeTab, setActiveTab] = useState('tab1');
@@ -30,7 +31,7 @@ const Tabs = ({id}) => {
         </MDBTabsItem>
         <MDBTabsItem className='custom-tabs-item' style={{borderBottom: '1px solid #ccc', borderRight: '1px solid #ccc'}}>
           <MDBTabsLink onClick={() => handleTabClick('tab2')} active={activeTab === 'tab2'} className='custom-tabs-link'>
-            Events
+            Forum
           </MDBTabsLink>
         </MDBTabsItem>
       </MDBTabs>
@@ -40,7 +41,7 @@ const Tabs = ({id}) => {
           <UserChat id={id}/>
         </MDBTabsPane>
         <MDBTabsPane open={activeTab === 'tab2'}>
-          Insert events
+          <Forum />
         </MDBTabsPane>
       </MDBTabsContent>
     </>

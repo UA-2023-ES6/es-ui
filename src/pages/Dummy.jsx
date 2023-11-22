@@ -65,7 +65,9 @@ const Dummy = () => {
     
     const [success] = useState(state ? state.success : null)
 
-    window.history.replaceState(null, "", "/dummy" + window.location.pathname); //remove the state to prevent the success message from showing up again on refresh
+    if (state) {
+        window.history.replaceState(null, "", window.location.pathname); //remove the state to prevent the success message from showing up again on refresh
+      }
     
     const {"*": currentPath} = useParams();
     const [groupName, setGroupName] = useState("");

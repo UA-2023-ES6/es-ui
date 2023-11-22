@@ -1,33 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MDBAccordion, MDBAccordionItem } from 'mdb-react-ui-kit';
 
-const Forum = () => {
-  const [questions, setQuestions] = useState([]);
-  const [newQuestion, setNewQuestion] = useState('');
+const SERVER_API = "http://localhost:5000/api"
 
-  const addQuestion = () => {
+const Forum = ({id}) => {
+    const [questions, setQuestions] = useState([]);
+    const [newQuestion, setNewQuestion] = useState('');
+    const [activeItem, setActiveItem] = useState(-1);
+
+  const handleSendQuestion = async () => {
     if (newQuestion.trim() !== '') {
-      const updatedQuestions = [
-        ...questions,
-        { id: questions.length + 1, question: newQuestion, answers: [] },
-      ];
-      setQuestions(updatedQuestions);
-      setNewQuestion('');
+      const question = {
+        "content": newQuestion,
+        "groupId": id,
+        "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
+      };
+  
+      try {
+        const response = await fetch(`${SERVER_API}/Question`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(question),
+        });
+  
+        if (response.ok) {
+          try {
+            const response = await fetch(`${SERVER_API}/Question/group/${id}`);
+            const data = await response.json();
+            const allQuestions = extractContent(data);
+            setQuestions(allQuestions);
+            console.log("All questions:",allQuestions)
+          } catch (error) {
+            console.error('Error fetching initial questions:', error);
+          }
+          setNewQuestion('');
+        } else {
+          console.error('Failed to send question. Server responded with:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Error sending question:', error);
+      }
     }
   };
 
+  const fetchNewQuestions = async () => {
+    try {
+      const response = await fetch(`${SERVER_API}/Question/group/${id}`);
+      const data = await response.json();
+      const newMessages = extractContent(data);
+      setQuestions(newMessages);
+    } catch (error) {
+      console.error('Error fetching new questions:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNewQuestions();
+  }, [id]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchNewQuestions();
+    }, 500);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [id]);
+
+  const toggleAccordionItem = (index) => {
+    setActiveItem((prevActiveItem) => (prevActiveItem === index ? -1 : index));
+  };
+
   const addAnswer = (questionId, newAnswer) => {
-    const updatedQuestions = questions.map((q) =>
-      q.id === questionId ? { ...q, answers: [...q.answers, { content: newAnswer, show: true }] } : q
-    );
-    setQuestions(updatedQuestions);
+    
   };
 
   const toggleAnswer = (questionId, answerIndex) => {
-    const updatedQuestions = questions.map((q) =>
-      q.id === questionId ? { ...q, answers: q.answers.map((ans, index) => (index === answerIndex ? { ...ans, show: !ans.show } : ans)) } : q
-    );
-    setQuestions(updatedQuestions);
+    
   };
 
   return (
@@ -44,11 +96,15 @@ const Forum = () => {
         marginBottom: '10px',
       }}
       >
-        <MDBAccordion>
-          {questions.map((q) => (
-            <MDBAccordionItem key={q.id} collapseId={`collapse${q.id}`} headerTitle={q.question}>
+        <MDBAccordion alwaysOpen active={activeItem} onChange={(itemId) => setActiveItem(itemId)} flush>
+          {questions.map((q,index) => (
+            <MDBAccordionItem 
+                key={q.questionId} 
+                collapseId={index} 
+                headerTitle={q.content}
+            >
               <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-                <button onClick={() => addAnswer(q.id, 'New Answer')}>
+                <button onClick={() => addAnswer(q.questionId, 'New Answer')}>
                   Add Answer
                 </button>
               </div>
@@ -60,7 +116,7 @@ const Forum = () => {
                     padding: '10px',
                     marginBottom: '10px',
                   }}
-                  onClick={() => toggleAnswer(q.id, index)}
+                  onClick={() => toggleAnswer(q.questionId, index)}
                 >
                   {answer.show && <div>{answer.content}</div>}
                 </div>
@@ -79,7 +135,7 @@ const Forum = () => {
             onChange={(e) => setNewQuestion(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                addQuestion();
+                handleSendQuestion();
               }
             }}
             style={{
@@ -98,5 +154,14 @@ const Forum = () => {
     </div>
   );
 };
+
+function extractContent(json) {
+    return json.data.map(item => ({
+      questionId: item.id,
+      content: item.content,
+      createDate: new Date(item.createDate),
+      username: item.senderName
+    }));
+  }
 
 export { Forum };

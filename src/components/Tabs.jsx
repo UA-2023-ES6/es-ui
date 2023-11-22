@@ -38,10 +38,10 @@ const Tabs = ({id}) => {
 
       <MDBTabsContent>
         <MDBTabsPane open={activeTab === 'tab1'}>
-          <UserChat id={id}/>
+          <UserChat id={id} />
         </MDBTabsPane>
         <MDBTabsPane open={activeTab === 'tab2'}>
-          <Forum />
+          <Forum id={id} />
         </MDBTabsPane>
       </MDBTabsContent>
     </>

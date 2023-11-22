@@ -76,7 +76,7 @@ const UserChat = ({id}) => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       fetchNewMessages();
-    }, 200);
+    }, 1000);
 
     return () => {
       clearInterval(intervalId);

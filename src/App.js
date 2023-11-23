@@ -17,6 +17,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 function App() {
 
     const [loggedIn,setLoggedIn] = useState(false)
+    const [idToken,setIdToken] = useState("")
 
     const userGroups = [
         "grupo 1",
@@ -30,15 +31,15 @@ function App() {
         <div className="d-flex flex-column" style={{height: "100vh"}}>
             <Account>
                 <BrowserRouter>
-                    <Header userGroups={userGroups} isLoggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
+                    <Header userGroups={userGroups} isLoggedIn={loggedIn} setLoggedIn={setLoggedIn} setIdToken={setIdToken}/>
                     <div style={{flex: "1"}}>
                         <Routes>
                             <Route path="/" element={<MainPage />}/>
-                            <Route path="/auth" element={<LoginPage setLoggedIn={setLoggedIn} />}/>
+                            <Route path="/auth" element={<LoginPage setLoggedIn={setLoggedIn} setIdToken={setIdToken} />}/>
                             <Route path="/home" element={<UserHomePage userGroups={userGroups}/>}/>
                             <Route path="/groupName" element={<UserGroupPage />}/>
                             <Route path="/serverTime" element={<ServerTime />} />
-                            <Route path="/dummy/*" element={<Dummy />} />
+                            <Route path="/dummy/*" element={<Dummy token={idToken}/>} />
                             <Route path="*" element={<NoPage />} />
                         </Routes>
                     </div>

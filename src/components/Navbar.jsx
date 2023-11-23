@@ -4,7 +4,7 @@ import { AccountContext } from "./Account"
 import { useContext, useEffect } from "react"
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const Navbar = ({userGroups,setLoggedIn,isLoggedIn}) => {
+const Navbar = ({userGroups,setLoggedIn,isLoggedIn,setIdToken}) => {
     const {getSession,logout} = useContext(AccountContext)
     const currentPath = useLocation()
     const navigate = useNavigate()
@@ -20,8 +20,13 @@ const Navbar = ({userGroups,setLoggedIn,isLoggedIn}) => {
         .then(session => {
             console.log("Session:",session)
             setLoggedIn(true)
+            setIdToken(session.idToken.jwtToken)
+            console.log(session.idToken.jwtToken)
         })
-        .catch(err => setLoggedIn(false))
+        .catch(err => () => {
+            setLoggedIn(false)
+            setIdToken("")
+        })
     },[])
 
     return(

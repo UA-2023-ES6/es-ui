@@ -4,7 +4,7 @@ import Pool from "../UserPool"
 
 const AccountContext = createContext()
 
-const Account = (props) => {
+const Account = ({children}) => {
 
     const getSession = async () => {
         return await new Promise((resolve,reject) => {
@@ -58,7 +58,7 @@ const Account = (props) => {
 
     return(
         <AccountContext.Provider value={{authenticate, getSession, logout}}>
-            {props.children}
+            {children}
         </AccountContext.Provider>
     )
 }

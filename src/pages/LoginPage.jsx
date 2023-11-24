@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import SuccessMessage from '../components/SuccessMessage';
 import ErrorMessage from '../components/ErrorMessage';
 
-function LoginPage({setLoggedIn,setIdToken}) {
+function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
 
   const [justifyActive, setJustifyActive] = useState('tab1');;
 
@@ -40,10 +40,10 @@ function LoginPage({setLoggedIn,setIdToken}) {
           console.log(data)
           setLoggedIn(true)
           setIdToken(data.idToken.jwtToken)
+          _setUsername(data.idToken.payload["custom:username"])
           navigate("/dummy/institution", {state:{success:"Logged in successfully."}})
       })
       .catch((err) => {
-          console.log(err)
           setError(err.message)
       })
       

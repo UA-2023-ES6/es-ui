@@ -60,10 +60,9 @@ const test = {
 
 const SERVER_API = "https://localhost:7217/api"
 
-const Dummy = ({token}) => {
+const Dummy = ({token,username}) => {
   
     const {state} = useLocation()
-    
     const [success] = useState(state ? state.success : null)
 
     if (state) {
@@ -111,12 +110,10 @@ const Dummy = ({token}) => {
         if(token != null && token != "") {
             getData(`${SERVER_API}/Group`,token)
             .then((response) => {
-                console.log(response)
                 setPathIdMapping(buildPathIdMapping(response.data))
                 setSidebarContent(response.data)
-            .catch(err => console.log(err))
-        })
-    }
+            }).catch(err => console.log(err))
+        }
     },[token])
 
     
@@ -146,7 +143,7 @@ const Dummy = ({token}) => {
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    <Tabs id={selectedId} />
+                    {/* <Tabs id={selectedId} /> */}
                 </div>
             </div>
         </>

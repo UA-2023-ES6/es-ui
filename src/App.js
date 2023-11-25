@@ -9,7 +9,7 @@ import Footer from "./components/Footer";
 import Dummy from "./pages/Dummy";
 import { Account } from "./components/Account";
 import LoginPage from "./pages/LoginPage";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";

@@ -29,7 +29,7 @@ function App() {
                     <div style={{flex: "1"}}>
                         <Routes>
                             <Route path="/" element={<MainPage />}/>
-                            <Route path="/auth" element={<LoginPage setLoggedIn={setLoggedIn} setIdToken={setIdToken} _setUserName={setUserName}/>}/>
+                            <Route path="/auth" element={<LoginPage setLoggedIn={setLoggedIn} setIdToken={setIdToken} _setUsername={setUserName}/>}/>
                             <Route path="/home" element={<UserHomePage/>}/>
                             <Route path="/groupName" element={<UserGroupPage />}/>
                             <Route path="/serverTime" element={<ServerTime />} />

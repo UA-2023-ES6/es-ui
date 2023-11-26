@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Message } from './Message';
 import send_message_icon from "../imgs/UserChat/send_message_icon.png";
 
@@ -58,7 +58,7 @@ const UserChat = ({id}) => {
     }
   }, [messages]); 
 
-  const fetchNewMessages = async () => {
+  const fetchNewMessages = useCallback(async () => {
     try {
       const response = await fetch(`${SERVER_API}/Message/group/${id}`);
       const data = await response.json();
@@ -67,11 +67,11 @@ const UserChat = ({id}) => {
     } catch (error) {
       console.error('Error fetching new messages:', error);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchNewMessages();
-  }, [id]);
+  }, [fetchNewMessages]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -81,7 +81,7 @@ const UserChat = ({id}) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [id]);
+  }, [id,fetchNewMessages]);
 
 
   useEffect(() => {
@@ -135,7 +135,7 @@ const UserChat = ({id}) => {
               }}
             />
             <img
-              src={send_message_icon} // Replace with your image source
+              src={send_message_icon}
               alt="Send"
               style={{
                 cursor: 'pointer',

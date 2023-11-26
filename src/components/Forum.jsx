@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import add_answer_icon from "../imgs/Forum/add_answer_icon.png";
 import {
   MDBAccordion,
   MDBAccordionItem,
@@ -63,14 +64,14 @@ const Forum = ({id}) => {
     }
   };
 
-  const fetchNewQuestions = async () => {
+  const fetchNewQuestions = useCallback(async () => {
     try {
       const response = await fetch(`${SERVER_API}/Question/group/${id}`);
       if (response.ok) {
         const data = await response.json();
         const newMessages = extractContent(data);
         setQuestions(newMessages);
-
+  
         for (const q of newMessages) {
           const answers = await fetchAnswersForQuestion(q.questionId);
           setQuestionAnswers((prevQuestionAnswers) => ({ ...prevQuestionAnswers, ...answers }));
@@ -81,7 +82,11 @@ const Forum = ({id}) => {
     } catch (error) {
       console.error('Error fetching new questions:', error);
     }
-  };
+  }, [id]);
+  
+  useEffect(() => {
+    fetchNewQuestions();
+  }, [fetchNewQuestions]);
 
   const fetchAnswersForQuestion = async (questionId) => {
     try {
@@ -100,10 +105,6 @@ const Forum = ({id}) => {
   };
 
   useEffect(() => {
-    fetchNewQuestions();
-  }, [id]);
-
-  useEffect(() => {
     const intervalId = setInterval(() => {
       fetchNewQuestions();
     }, 500);
@@ -111,7 +112,7 @@ const Forum = ({id}) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [id]);
+  }, [id,fetchNewQuestions]);
 
   const closeModal = () => {
     console.log(questions)
@@ -185,18 +186,41 @@ const Forum = ({id}) => {
             <MDBAccordionItem 
               key={q.questionId} 
               collapseId={index} 
-              headerTitle={q.content}
+              headerTitle={
+                <div>
+                  <p>
+                    <strong style={{ fontSize: '16px' }}>{"teste2"}</strong> <span style={{ fontSize: '10px' }}>{q.createDate.toLocaleString()}</span>
+                  </p>
+                  <p style={{ fontSize: '20px' }}>{q.content}</p>
+                </div>
+              }
             >
               
               <MDBListGroup style={{ minWidth: '22rem' }} light small>
                 {questionAnswers[q.questionId]?.map((answer, answerIndex) => (
-                  <MDBListGroupItem key={answerIndex}>{answer.content}</MDBListGroupItem>
+                  <MDBListGroupItem key={answerIndex}>
+                    <div>{"> " + answer.content}</div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontWeight: 'bold', fontsize: '8px' }}>{"teste2"}</span> 
+                      <span style={{ marginLeft: '8px', fontSize: 'smaller' }}>{new Date(answer.createDate).toLocaleString()}</span>
+                    </div>
+                  </MDBListGroupItem>
                 ))}
+                <MDBListGroupItem style={{ 
+                  backgroundColor: '#f0f0f0',
+                  borderTopLeftRadius: '8px',
+                  borderTopRightRadius: '8px',
+                  }}>
+                  <div
+                    style={{ textAlign: 'center', fontWeight: 'bold', cursor: 'pointer',marginLeft: '5px' }}
+                    onClick={() => openModal(q.questionId)}
+                  >
+                    {"Add New Answer"}
+                  </div>
+                </MDBListGroupItem>
               </MDBListGroup>
               
-              <div style={{ padding: '10px', marginBottom: '5px' }}>
-                  <button onClick={() => openModal(q.questionId)}>Add Answer</button>
-              </div>
+              
 
             </MDBAccordionItem>
           ))}
@@ -211,7 +235,7 @@ const Forum = ({id}) => {
               </MDBModalHeader>
               <MDBModalBody>
                 <textarea
-                  style={{ width: '100%', height: '150px', resize: 'none' }}
+                  style={{ width: '100%', height: '150px', resize: 'none', }}
                   placeholder="Enter your answer..."
                   value={newAnswer}
                   onChange={(e) => setNewAnswer(e.target.value)}
@@ -232,13 +256,13 @@ const Forum = ({id}) => {
 
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
         <div style={{ position: 'relative', width: '600px' }}>
-          <input
-            type="text"
+          <textarea
             placeholder="Add a new question..."
             value={newQuestion}
             onChange={(e) => setNewQuestion(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 handleSendQuestion();
               }
             }}
@@ -250,11 +274,25 @@ const Forum = ({id}) => {
               resize: 'none',
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-word',
-              marginBottom: '5px',
+              marginTop: '0px'
             }}
+          />
+          <img
+            src={add_answer_icon}
+            alt="Send"
+            style={{
+              cursor: 'pointer',
+              position: 'absolute',
+              width: '45px',
+              height: '45px',
+              transform: 'translateY(-10%)',
+            }}
+            onClick={handleSendQuestion}
           />
         </div>
       </div>
+
+
     </div>
   );
 };

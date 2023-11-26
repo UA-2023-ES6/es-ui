@@ -143,7 +143,7 @@ const Dummy = ({token,username}) => {
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    {/* <Tabs id={selectedId} /> */}
+                    <Tabs id={selectedId} /> 
                 </div>
             </div>
         </>

@@ -16,6 +16,12 @@ COPY . .
 # Build the React app for production
 RUN npm run build
 
+ARG COGNITO_USER_POOL_ID
+ENV REACT_APP_COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}
+
+ARG COGNITO_CLIENT_ID
+ENV REACT_APP_COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
+
 # Expose the port on which the app will run
 EXPOSE 3000
 

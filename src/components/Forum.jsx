@@ -20,12 +20,36 @@ const SERVER_API = "http://localhost:5000/api"
 
 const Forum = ({id}) => {
     const [questions, setQuestions] = useState([]);
+    const [filteredQuestions, setFilteredQuestions] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [newQuestion, setNewQuestion] = useState('');
     const [activeItem, setActiveItem] = useState(-1);
     const [showModal, setShowModal] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(-1);
     const [newAnswer, setNewAnswer] = useState('')
     const [questionAnswers, setQuestionAnswers] = useState({});
+
+  const handleSearchChange = (event) => {
+    const searchTerm = event.target.value;
+    setSearchTerm(searchTerm);
+    filterQuestions(searchTerm);
+  };
+
+  const filterQuestions = (term) => {
+    if (term.trim() === '') {
+      setFilteredQuestions(questions);
+    } else {
+      const filtered = questions.filter((question) =>
+        question.content.toLowerCase().includes(term.toLowerCase())
+      );
+      setFilteredQuestions(filtered);
+    }
+  };
+
+  useEffect(() => {
+    filterQuestions(searchTerm);
+  }, [questions, searchTerm]);
+
 
   const handleSendQuestion = async () => {
     if (newQuestion.trim() !== '') {
@@ -169,6 +193,17 @@ const Forum = ({id}) => {
 
   return (
     <div>
+
+      <input
+        type="text"
+        placeholder="Search for a question..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{
+          width: '100%',
+        }}
+      />
+      
       <div style={{
         height: '70vh',
         overflowY: 'scroll',
@@ -182,7 +217,7 @@ const Forum = ({id}) => {
       }}
       >
         <MDBAccordion alwaysOpen active={activeItem} onChange={(itemId) => setActiveItem(itemId)} flush>
-          {questions.map((q,index) => (
+          {filteredQuestions.map((q,index) => (
             <MDBAccordionItem 
               key={q.questionId} 
               collapseId={index} 

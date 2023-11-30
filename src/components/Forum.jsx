@@ -14,11 +14,12 @@ import {
   MDBListGroup, 
   MDBListGroupItem,
 } from 'mdb-react-ui-kit';
+import {postData,getData} from "../utils/httpRequests";
 
 
-const SERVER_API = "http://localhost:5000/api"
+const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
 
-const Forum = ({id}) => {
+const Forum = ({id,token}) => {
     const [questions, setQuestions] = useState([]);
     const [filteredQuestions, setFilteredQuestions] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -59,73 +60,102 @@ const Forum = ({id}) => {
         "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
       };
   
-      try {
-        const response = await fetch(`${SERVER_API}/Question`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(question),
-        });
+      postData(`${SERVER_API}/Question`,token,question)
+      .then(data => {
+        getData(`${SERVER_API}/Question/group/${id}`,token)
+        .then(data => {
+          setQuestions(extractContent(data))
+        })
+        .catch(err => console.log(err))
+        setNewQuestion("")
+      })
+      .catch(err => console.log(err))
+      // try {
+      //   const response = await fetch(`${SERVER_API}/Question`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify(question),
+      //   });
   
-        if (response.ok) {
-          try {
-            const response = await fetch(`${SERVER_API}/Question/group/${id}`);
-            const data = await response.json();
-            const allQuestions = extractContent(data);
-            setQuestions(allQuestions);
-            console.log("All questions:",allQuestions)
-          } catch (error) {
-            console.error('Error fetching initial questions:', error);
-          }
-          setNewQuestion('');
-        } else {
-          console.error('Failed to send question. Server responded with:', response.status, response.statusText);
-        }
-      } catch (error) {
-        console.error('Error sending question:', error);
-      }
+      //   if (response.ok) {
+      //     try {
+      //       const response = await fetch(`${SERVER_API}/Question/group/${id}`);
+      //       const data = await response.json();
+      //       const allQuestions = extractContent(data);
+      //       setQuestions(allQuestions);
+      //       console.log("All questions:",allQuestions)
+      //     } catch (error) {
+      //       console.error('Error fetching initial questions:', error);
+      //     }
+      //     setNewQuestion('');
+      //   } else {
+      //   }
+      // } catch (error) {
+      //   console.error('Error sending question:', error);
+      // }
     }
   };
 
   const fetchNewQuestions = useCallback(async () => {
-    try {
-      const response = await fetch(`${SERVER_API}/Question/group/${id}`);
-      if (response.ok) {
-        const data = await response.json();
-        const newMessages = extractContent(data);
-        setQuestions(newMessages);
-  
-        for (const q of newMessages) {
-          const answers = await fetchAnswersForQuestion(q.questionId);
-          setQuestionAnswers((prevQuestionAnswers) => ({ ...prevQuestionAnswers, ...answers }));
-        }
-      } else {
-        console.error('Failed to fetch new questions. Server responded with:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Error fetching new questions:', error);
+    if(token == null || token == "")
+    {
+      console.log("token is null")
     }
-  }, [id]);
+    else {
+      getData(`${SERVER_API}/Question/group/${id}`,token)
+      .then(data => {
+        setQuestions(extractContent(data))
+        for (const q of extractContent(data)) {
+          fetchAnswersForQuestion(q.questionId)
+          .then(answers => setQuestionAnswers((prevQuestionAnswers) => ({ ...prevQuestionAnswers, ...answers })))
+          .catch(err => console.log(err))
+        }
+      })
+      .catch(err => console.log(err))
+    }
+    // try {
+    //   const response = await fetch(`${SERVER_API}/Question/group/${id}`);
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     const newMessages = extractContent(data);
+    //     setQuestions(newMessages);
+  
+    //     for (const q of newMessages) {
+    //       const answers = await fetchAnswersForQuestion(q.questionId);
+    //       setQuestionAnswers((prevQuestionAnswers) => ({ ...prevQuestionAnswers, ...answers }));
+    //     }
+    //   } else {
+    //   }
+    // } catch (error) {
+    //   console.error('Error fetching new questions:', error);
+    // }
+  }, [id,token]);
   
   useEffect(() => {
     fetchNewQuestions();
-  }, [fetchNewQuestions]);
+  }, [fetchNewQuestions,token]);
 
   const fetchAnswersForQuestion = async (questionId) => {
-    try {
-      const response = await fetch(`${SERVER_API}/Answer/question/${questionId}`);
-      if (response.ok) {
-        const data = await response.json();
-        return { [questionId]: data.data };
-      } else {
-        console.error(`Failed to fetch answers for question ID ${questionId}. Server responded with:`, response.status, response.statusText);
-        return { [questionId]: [] };
-      }
-    } catch (error) {
-      console.error(`Error fetching answers for question ID ${questionId}:`, error);
-      return { [questionId]: [] };
-    }
+    getData(`${SERVER_API}/Answer/question/${questionId}`,token)
+    .then(data => {
+      return { [questionId]: data.data }
+    })
+    .catch(err => console.log(err))
+    // try {
+    //   const response = await fetch(`${SERVER_API}/Answer/question/${questionId}`);
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     ;
+    //   } else {
+    //     console.error(`Failed to fetch answers for question ID ${questionId}. Server responded with:`, response.status, response.statusText);
+    //     return { [questionId]: [] };
+    //   }
+    // } catch (error) {
+    //   console.error(`Error fetching answers for question ID ${questionId}:`, error);
+    //   return { [questionId]: [] };
+    // }
   };
 
   useEffect(() => {
@@ -136,7 +166,7 @@ const Forum = ({id}) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [id,fetchNewQuestions]);
+  }, [id,fetchNewQuestions,token]);
 
   const closeModal = () => {
     console.log(questions)
@@ -159,35 +189,49 @@ const Forum = ({id}) => {
         "questionId": selectedQuestion,
         "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
       };
-  
-      try {
-        const response = await fetch(`${SERVER_API}/Answer`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(answer),
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-  
-          if (Array.isArray(data) && data.length > 0) {
-            console.log('New answer added:', data);
-            setQuestionAnswers((prevQuestionAnswers) => ({
-              ...prevQuestionAnswers,
-              [selectedQuestion]: [...(prevQuestionAnswers[selectedQuestion] || []), data],
-            }));
-          } else {
-            console.log('No answer data returned from the API for questionId='+selectedQuestion);
-          }
-          closeModal();
+      
+      postData(`${SERVER_API}/Answer`,token,answer)
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          console.log('New answer added:', data);
+          setQuestionAnswers((prevQuestionAnswers) => ({
+            ...prevQuestionAnswers,
+            [selectedQuestion]: [...(prevQuestionAnswers[selectedQuestion] || []), data],
+          }));
         } else {
-          console.error('Failed to add answer. Server responded with:', response.status, response.statusText);
+          console.log('No answer data returned from the API for questionId='+selectedQuestion);
         }
-      } catch (error) {
-        console.error('Error adding answer:', error);
-      }
+        closeModal();
+      })
+      .catch(err => console.log(err))
+      // try {
+      //   const response = await fetch(`${SERVER_API}/Answer`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify(answer),
+      //   });
+  
+      //   if (response.ok) {
+      //     const data = await response.json();
+  
+      //     if (Array.isArray(data) && data.length > 0) {
+      //       console.log('New answer added:', data);
+      //       setQuestionAnswers((prevQuestionAnswers) => ({
+      //         ...prevQuestionAnswers,
+      //         [selectedQuestion]: [...(prevQuestionAnswers[selectedQuestion] || []), data],
+      //       }));
+      //     } else {
+      //       console.log('No answer data returned from the API for questionId='+selectedQuestion);
+      //     }
+      //     closeModal();
+      //   } else {
+      //     console.error('Failed to add answer. Server responded with:', response.status, response.statusText);
+      //   }
+      // } catch (error) {
+      //   console.error('Error adding answer:', error);
+      // }
     }
   };
 

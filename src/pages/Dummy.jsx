@@ -58,7 +58,7 @@ const test = {
     ]
   }
 
-const SERVER_API = "https://localhost:7217/api"
+const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
 
 const Dummy = ({token,username}) => {
   
@@ -143,7 +143,7 @@ const Dummy = ({token,username}) => {
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    <Tabs id={selectedId} /> 
+                    <Tabs id={selectedId} token={token}/> 
                 </div>
             </div>
         </>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Message } from './Message';
 import send_message_icon from "../imgs/UserChat/send_message_icon.png";
+import {postData,getData} from "../utils/httpRequests";
 
-const SERVER_API = "http://localhost:5000/api"
+const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
 
-const UserChat = ({id}) => {
+const UserChat = ({id,token}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const messageContainerRef = useRef(null);
@@ -21,33 +22,47 @@ const UserChat = ({id}) => {
         "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
       };
   
-      try {
-        const response = await fetch(`${SERVER_API}/Message`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(message),
-        });
-  
-        if (response.ok) {
-          try {
-            const response = await fetch(`${SERVER_API}/Message/group/${id}`);
-            const data = await response.json();
-            const all_messages = extractContent(data)
-            //console.log("all_messages:",all_messages)
-            setMessages(all_messages);
-          } catch (error) {
-            console.error('Error fetching initial messages:', error);
-          }
-          setNewMessage('');
-          //console.log("All messages:",messages)
-        } else {
-          console.error('Failed to send message. Server responded with:', response.status, response.statusText);
-        }
-      } catch (error) {
-        console.error('Error sending message:', error);
+      if(token == null || token == "")
+      {
+        console.log("token is null")
       }
+      else{
+        postData(`${SERVER_API}/Message`,token,message)
+        .then(response => {
+            getData(`${SERVER_API}/Message/group/${id}`,token)
+            .then(data => {
+              setMessages(extractContent(data))
+            })
+            .catch(err => {
+              console.log(err)
+            })
+            setNewMessage('');
+        })
+        .catch(err => console.log(err))
+      }
+      
+        // fetch(`${SERVER_API}/Message`, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify(message),
+        // }).then().catch(err => console.log(err));
+  
+        // if (response.ok) {
+        //   try {
+        //     const response = await fetch(`${SERVER_API}/Message/group/${id}`);
+        //     const data = await response.json();
+        //     const all_messages = extractContent(data)
+        //     //console.log("all_messages:",all_messages)
+        //     setMessages(all_messages);
+        //   } catch (error) {
+        //     console.error('Error fetching initial messages:', error);
+        //   }
+        //   setNewMessage('');
+        //   //console.log("All messages:",messages)
+        // } else {
+        // }
     }
   };
   
@@ -56,37 +71,65 @@ const UserChat = ({id}) => {
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
-  }, [messages]); 
+  }, [messages,token]); 
 
   const fetchNewMessages = useCallback(async () => {
-    try {
-      const response = await fetch(`${SERVER_API}/Message/group/${id}`);
-      const data = await response.json();
-      const newMessages = extractContent(data);
-      setMessages(newMessages);
-    } catch (error) {
-      console.error('Error fetching new messages:', error);
+    if(token == null || token == "")
+    {
+      console.log("token is null")
     }
-  }, [id]);
+    else {
+      getData(`${SERVER_API}/Message/group/${id}`,token)
+      .then(data => {
+        setMessages(extractContent(data))
+      })
+      .catch(err => console.log(err))
+    }
+    // try {
+    //   const response = await fetch(`${SERVER_API}/Message/group/${id}`);
+    //   const data = await response.json();
+    //   const newMessages = extractContent(data);
+    //   setMessages(newMessages);
+    // } catch (error) {
+    //   console.error('Error fetching new messages:', error);
+    // }
+  }, [id,token]);
 
   useEffect(() => {
-    fetchNewMessages();
-  }, [fetchNewMessages]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
+    if(token == null || token == "")
+    {
+      console.log("token is null")
+    }
+    else {
       fetchNewMessages();
-    }, 1000);
+    }
+  }, [fetchNewMessages,token]);
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [id,fetchNewMessages]);
+  useEffect(() => {
+    if(token == null || token == "")
+    {
+      console.log("token is null")
+    }
+    else {
+      const intervalId = setInterval(() => {
+        fetchNewMessages();
+      }, 1000);
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [id,fetchNewMessages,token]);
 
 
   useEffect(() => {
-    if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    if(token == null || token == "")
+    {
+      console.log("token is null")
+    }
+    else {
+      if (messageContainerRef.current) {
+        messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+      }
     }
   }, []);
 

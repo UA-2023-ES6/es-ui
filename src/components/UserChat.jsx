@@ -15,54 +15,27 @@ const UserChat = ({id,token}) => {
   };
 
   const handleSendMessage = async () => {
-    if (newMessage.trim() !== '') {
-      const message = {
-        "content": newMessage,
-        "groupId": id,
-        "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
-      };
-  
-      if(token == null || token == "")
-      {
-        console.log("token is null")
+    if(token != null && token != ""){
+      if (newMessage.trim() !== '') {
+        const message = {
+          "content": newMessage,
+          "groupId": id,
+          "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
+        };
+    
+          postData(`${SERVER_API}/Message`,token,message)
+          .then(response => {
+              getData(`${SERVER_API}/Message/group/${id}`,token)
+              .then(data => {
+                setMessages(extractContent(data))
+              })
+              .catch(err => {
+                console.log(err)
+              })
+              setNewMessage('');
+          })
+          .catch(err => console.log(err))
       }
-      else{
-        postData(`${SERVER_API}/Message`,token,message)
-        .then(response => {
-            getData(`${SERVER_API}/Message/group/${id}`,token)
-            .then(data => {
-              setMessages(extractContent(data))
-            })
-            .catch(err => {
-              console.log(err)
-            })
-            setNewMessage('');
-        })
-        .catch(err => console.log(err))
-      }
-      
-        // fetch(`${SERVER_API}/Message`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify(message),
-        // }).then().catch(err => console.log(err));
-  
-        // if (response.ok) {
-        //   try {
-        //     const response = await fetch(`${SERVER_API}/Message/group/${id}`);
-        //     const data = await response.json();
-        //     const all_messages = extractContent(data)
-        //     //console.log("all_messages:",all_messages)
-        //     setMessages(all_messages);
-        //   } catch (error) {
-        //     console.error('Error fetching initial messages:', error);
-        //   }
-        //   setNewMessage('');
-        //   //console.log("All messages:",messages)
-        // } else {
-        // }
     }
   };
   
@@ -74,43 +47,23 @@ const UserChat = ({id,token}) => {
   }, [messages,token]); 
 
   const fetchNewMessages = useCallback(async () => {
-    if(token == null || token == "")
-    {
-      console.log("token is null")
-    }
-    else {
+    if(token != null && token != "") {
       getData(`${SERVER_API}/Message/group/${id}`,token)
       .then(data => {
         setMessages(extractContent(data))
       })
       .catch(err => console.log(err))
     }
-    // try {
-    //   const response = await fetch(`${SERVER_API}/Message/group/${id}`);
-    //   const data = await response.json();
-    //   const newMessages = extractContent(data);
-    //   setMessages(newMessages);
-    // } catch (error) {
-    //   console.error('Error fetching new messages:', error);
-    // }
   }, [id,token]);
 
   useEffect(() => {
-    if(token == null || token == "")
-    {
-      console.log("token is null")
-    }
-    else {
+    if(token != null && token != "") {
       fetchNewMessages();
     }
   }, [fetchNewMessages,token]);
 
   useEffect(() => {
-    if(token == null || token == "")
-    {
-      console.log("token is null")
-    }
-    else {
+    if(token != null && token != "") {
       const intervalId = setInterval(() => {
         fetchNewMessages();
       }, 1000);
@@ -122,14 +75,8 @@ const UserChat = ({id,token}) => {
 
 
   useEffect(() => {
-    if(token == null || token == "")
-    {
-      console.log("token is null")
-    }
-    else {
-      if (messageContainerRef.current) {
-        messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
-      }
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   }, []);
 

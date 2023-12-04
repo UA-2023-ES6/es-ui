@@ -20,7 +20,7 @@ const Navbar = ({setLoggedIn,isLoggedIn,setIdToken,setUserName}) => {
         .then(session => {
             setLoggedIn(true)
             setIdToken(session.idToken.jwtToken)
-            setUserName(session.idToken.payload["custom:username"])
+            setUserName(session.idToken.payload["cognito:username"])
         })
         .catch(err => () => {
             setLoggedIn(false)

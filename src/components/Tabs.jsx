@@ -10,7 +10,7 @@ import "../styles/tabs.css";
 import { UserChat } from "./UserChat"
 import { Forum } from "./Forum"
 
-const Tabs = ({id}) => {
+const Tabs = ({id,token}) => {
   const [activeTab, setActiveTab] = useState('tab1');
   //console.log(selected_id)
   const handleTabClick = (value) => {
@@ -38,10 +38,10 @@ const Tabs = ({id}) => {
 
       <MDBTabsContent>
         <MDBTabsPane open={activeTab === 'tab1'}>
-          <UserChat id={id} />
+          <UserChat id={id} token={token}/>
         </MDBTabsPane>
         <MDBTabsPane open={activeTab === 'tab2'}>
-          <Forum id={id} />
+          <Forum id={id} token={token}/>
         </MDBTabsPane>
       </MDBTabsContent>
     </>

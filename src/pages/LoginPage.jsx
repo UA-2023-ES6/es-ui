@@ -40,7 +40,7 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
           console.log(data)
           setLoggedIn(true)
           setIdToken(data.idToken.jwtToken)
-          _setUsername(data.idToken.payload["custom:username"])
+          _setUsername(data.idToken.payload["cognito:username"])
           navigate("/dummy/institution", {state:{success:"Logged in successfully."}})
       })
       .catch((err) => {

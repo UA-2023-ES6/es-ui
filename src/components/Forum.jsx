@@ -77,16 +77,19 @@ const Forum = ({id,token}) => {
 
   const fetchNewQuestions = useCallback(async () => {
     if(token != null && token != "") {
-      getData(`${SERVER_API}/Question/group/${id}`,token)
-      .then(data => {
-        setQuestions(extractContent(data))
-        for (const q of extractContent(data)) {
-          fetchAnswersForQuestion(q.questionId)
-          .then(answers => setQuestionAnswers((prevQuestionAnswers) => ({ ...prevQuestionAnswers, ...answers })))
-          .catch(err => console.log(err))
-        }
-      })
-      .catch(err => console.log(err))
+      const data = await getData(`${SERVER_API}/Question/group/${id}`,token)
+      setQuestions(extractContent(data));
+
+      for (const q of extractContent(data)) {
+        console.log("q:", q);
+        console.log("questionsAnswers:",questionAnswers);
+        const answers = await fetchAnswersForQuestion(q.questionId)
+        console.log("answers:",answers)
+        setQuestionAnswers(prevQuestionAnswers => ({
+                          ...prevQuestionAnswers,
+                          [q.questionId]: answers,
+                          })); 
+      }
     }
   }, [id,token]);
   
@@ -95,19 +98,23 @@ const Forum = ({id,token}) => {
   }, [fetchNewQuestions,token]);
 
   const fetchAnswersForQuestion = async (questionId) => {
-    if(token != null && token != "") {
-      getData(`${SERVER_API}/Answer/question/${questionId}`,token)
-      .then(data => {
-        return { [questionId]: data.data }
-      })
-      .catch(err => console.log(err))
+    try {
+      if (token != null && token != "") {
+        const data = await getData(`${SERVER_API}/Answer/question/${questionId}`, token);
+        console.log("data:", data);
+        return data.data;
+      }
+      return null;
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   };
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       fetchNewQuestions();
-    }, 500);
+    }, 5000);
 
     return () => {
       clearInterval(intervalId);
@@ -135,22 +142,9 @@ const Forum = ({id,token}) => {
           "content": newAnswer,
           "questionId": selectedQuestion,
           "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
-        };
-        
-        postData(`${SERVER_API}/Answer`,token,answer)
-        .then(data => {
-          if (Array.isArray(data) && data.length > 0) {
-            console.log('New answer added:', data);
-            setQuestionAnswers((prevQuestionAnswers) => ({
-              ...prevQuestionAnswers,
-              [selectedQuestion]: [...(prevQuestionAnswers[selectedQuestion] || []), data],
-            }));
-          } else {
-            console.log('No answer data returned from the API for questionId='+selectedQuestion);
-          }
-          closeModal();
-        })
-        .catch(err => console.log(err))
+        };  
+        postData(`${SERVER_API}/Answer`,token,answer) 
+        closeModal();
       }
     }
   };

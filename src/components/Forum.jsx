@@ -81,10 +81,7 @@ const Forum = ({id,token}) => {
       setQuestions(extractContent(data));
 
       for (const q of extractContent(data)) {
-        console.log("q:", q);
-        console.log("questionsAnswers:",questionAnswers);
         const answers = await fetchAnswersForQuestion(q.questionId)
-        console.log("answers:",answers)
         setQuestionAnswers(prevQuestionAnswers => ({
                           ...prevQuestionAnswers,
                           [q.questionId]: answers,
@@ -101,7 +98,6 @@ const Forum = ({id,token}) => {
     try {
       if (token != null && token != "") {
         const data = await getData(`${SERVER_API}/Answer/question/${questionId}`, token);
-        console.log("data:", data);
         return data.data;
       }
       return null;
@@ -122,9 +118,6 @@ const Forum = ({id,token}) => {
   }, [id,fetchNewQuestions,token]);
 
   const closeModal = () => {
-    console.log(questions)
-    console.log(questionAnswers)
-    console.log(selectedQuestion)
     setNewAnswer('')
     setSelectedQuestion(-1)
     setShowModal(false)

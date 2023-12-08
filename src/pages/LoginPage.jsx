@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import SuccessMessage from '../components/SuccessMessage';
 import ErrorMessage from '../components/ErrorMessage';
 
-function LoginPage({setLoggedIn}) {
+function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
 
   const [justifyActive, setJustifyActive] = useState('tab1');;
 
@@ -39,10 +39,11 @@ function LoginPage({setLoggedIn}) {
       .then((data) => {
           console.log(data)
           setLoggedIn(true)
+          setIdToken(data.idToken.jwtToken)
+          _setUsername(data.idToken.payload["cognito:username"])
           navigate("/dummy/institution", {state:{success:"Logged in successfully."}})
       })
       .catch((err) => {
-          console.log(err)
           setError(err.message)
       })
       
@@ -50,7 +51,7 @@ function LoginPage({setLoggedIn}) {
 
   const signUp = (event) => {
     event.preventDefault()
-    userPool.signUp(email,password,[],null, (err,data) => {
+    userPool.signUp(email,password,[{"Name":"custom:username","Value":username}],null, (err,data) => {
         if(err){
             console.error(err)
             setError(err.message)

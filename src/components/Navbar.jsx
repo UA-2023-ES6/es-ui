@@ -4,7 +4,7 @@ import { AccountContext } from "./Account"
 import { useContext, useEffect } from "react"
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const Navbar = ({userGroups,setLoggedIn,isLoggedIn}) => {
+const Navbar = ({setLoggedIn,isLoggedIn,setIdToken,setUserName}) => {
     const {getSession,logout} = useContext(AccountContext)
     const currentPath = useLocation()
     const navigate = useNavigate()
@@ -18,17 +18,21 @@ const Navbar = ({userGroups,setLoggedIn,isLoggedIn}) => {
     useEffect(() => {
         getSession()
         .then(session => {
-            console.log("Session:",session)
             setLoggedIn(true)
+            setIdToken(session.idToken.jwtToken)
+            setUserName(session.idToken.payload["cognito:username"])
         })
-        .catch(err => setLoggedIn(false))
+        .catch(err => () => {
+            setLoggedIn(false)
+            setIdToken("")
+        })
     },[])
 
     return(
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
                 <div className="collapse navbar-collapse">
-                    <NavbarLinks userGroups={userGroups}/>
+                    <NavbarLinks/>
                     {isLoggedIn ? <NavbarUser logout={uiLogout}/> : currentPath.pathname === "/auth" ? null : <NavbarLogin/>}
                 </div>
             </div>
@@ -36,7 +40,7 @@ const Navbar = ({userGroups,setLoggedIn,isLoggedIn}) => {
     )
 }
 
-const NavbarLinks = ({userGroups}) => {
+const NavbarLinks = () => {
     return(
         <div className="navbar-nav me-auto mb-2 mb-lg-0">
             <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">

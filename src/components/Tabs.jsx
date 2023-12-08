@@ -8,8 +8,9 @@ import {
 } from 'mdb-react-ui-kit';
 import "../styles/tabs.css";
 import { UserChat } from "./UserChat"
+import { Forum } from "./Forum"
 
-const Tabs = ({id}) => {
+const Tabs = ({id,token}) => {
   const [activeTab, setActiveTab] = useState('tab1');
   //console.log(selected_id)
   const handleTabClick = (value) => {
@@ -30,17 +31,17 @@ const Tabs = ({id}) => {
         </MDBTabsItem>
         <MDBTabsItem className='custom-tabs-item' style={{borderBottom: '1px solid #ccc', borderRight: '1px solid #ccc'}}>
           <MDBTabsLink onClick={() => handleTabClick('tab2')} active={activeTab === 'tab2'} className='custom-tabs-link'>
-            Events
+            Forum
           </MDBTabsLink>
         </MDBTabsItem>
       </MDBTabs>
 
       <MDBTabsContent>
         <MDBTabsPane open={activeTab === 'tab1'}>
-          <UserChat id={id}/>
+          <UserChat id={id} token={token}/>
         </MDBTabsPane>
         <MDBTabsPane open={activeTab === 'tab2'}>
-          Insert events
+          <Forum id={id} token={token}/>
         </MDBTabsPane>
       </MDBTabsContent>
     </>

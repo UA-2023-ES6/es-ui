@@ -4,6 +4,7 @@ import { Link, useParams, useLocation } from "react-router-dom"
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
+import {postData,getData} from "../utils/httpRequests";
 
 import SuccessMessage from '../components/SuccessMessage'
 
@@ -57,15 +58,16 @@ const test = {
     ]
   }
 
-const SERVER_API = "http://localhost:5000/api"
+const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
 
-const Dummy = () => {
+const Dummy = ({token,username}) => {
   
     const {state} = useLocation()
-    
     const [success] = useState(state ? state.success : null)
 
-    window.history.replaceState(null, "", "/dummy" + window.location.pathname); //remove the state to prevent the success message from showing up again on refresh
+    if (state) {
+        window.history.replaceState(null, "", window.location.pathname); //remove the state to prevent the success message from showing up again on refresh
+      }
     
     const {"*": currentPath} = useParams();
     const [groupName, setGroupName] = useState("");
@@ -85,45 +87,34 @@ const Dummy = () => {
 
     const handleChange = (e) => setGroupName(e.target.value);
 
-    const handleCreate = () => {
-        //console.log("Groupname:",groupName)
+    const handleCreate = async () => {
         const data = {
             name: groupName,
             parentGroupId: id
         }
 
-        const t = JSON.stringify(data)
-        //console.log(t)
-
-        fetch(`${SERVER_API}/Group`,{
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: t
-        }).catch(err => console.log(err))
+        await postData(`${SERVER_API}/Group`,token,data)
+        .catch(err => console.log(err))
         setSelectedId(1);
         handleClose();
     }
 
     const onElementClick = (path) => {
-        //console.log("path:",path)
         setPath(path);
         setSelectedId(pathIdMapping[path.substring(1)]);
-        //console.log("pathIdMapping:",pathIdMapping)
-        //console.log("pathIdMapping[path]:",pathIdMapping[path.substring(1)])
-        //console.log("selectedId:",selectedId)
     };
       
 
 
     useEffect(() => {
-        getGroups(setPathIdMapping).then((data) => {
-            setSidebarContent(data);
-            setPathIdMapping(buildPathIdMapping(data));
-        })
-    },[])
+        if(token != null && token != "") {
+            getData(`${SERVER_API}/Group`,token)
+            .then((response) => {
+                setPathIdMapping(buildPathIdMapping(response.data))
+                setSidebarContent(response.data)
+            }).catch(err => console.log(err))
+        }
+    },[token])
 
     
     if(currentPath === "") {
@@ -152,29 +143,11 @@ const Dummy = () => {
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    <Tabs id={selectedId} />
+                    <Tabs id={selectedId} token={token}/> 
                 </div>
             </div>
         </>
     )
-}
-
-async function getGroups(setPathIdMapping) {
-    try{
-        const response = await fetch(`${SERVER_API}/Group?Take=100&Skip=0`)
-        const data = await response.json()
-        //console.log("getGroups:",data)
-        //console.log("map:",map)
-
-        const mapping = buildPathIdMapping(data.data);
-        setPathIdMapping(mapping);
-
-        return data.data
-    }
-    catch {
-        console.log("error")
-        return []
-    }
 }
 
 function MySidebar({content,onAddClick,onElementClick,activeLink,basePath}) {

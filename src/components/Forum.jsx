@@ -19,7 +19,7 @@ import {postData,getData} from "../utils/httpRequests";
 
 const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
 
-const Forum = ({id,token}) => {
+const Forum = ({id,token,username}) => {
     const [questions, setQuestions] = useState([]);
     const [filteredQuestions, setFilteredQuestions] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -53,12 +53,12 @@ const Forum = ({id,token}) => {
 
 
   const handleSendQuestion = async () => {
-    if(token != null && token != "") {
+    if(token !== null && token !== "") {
       if (newQuestion.trim() !== '') {
         const question = {
           "content": newQuestion,
           "groupId": id,
-          "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
+          "userId": username, // change later when login is connected to main page
         };
     
         postData(`${SERVER_API}/Question`,token,question)
@@ -76,7 +76,7 @@ const Forum = ({id,token}) => {
   };
 
   const fetchNewQuestions = useCallback(async () => {
-    if(token != null && token != "") {
+    if(token !== null && token !== "") {
       const data = await getData(`${SERVER_API}/Question/group/${id}`,token)
       setQuestions(extractContent(data));
 
@@ -96,7 +96,7 @@ const Forum = ({id,token}) => {
 
   const fetchAnswersForQuestion = async (questionId) => {
     try {
-      if (token != null && token != "") {
+      if (token !== null && token !== "") {
         const data = await getData(`${SERVER_API}/Answer/question/${questionId}`, token);
         return data.data;
       }
@@ -126,15 +126,17 @@ const Forum = ({id,token}) => {
   const openModal = (questionId) => {
     setSelectedQuestion(questionId)
     setShowModal(true)
+    console.log(questionAnswers)
+    console.log(questions)
   };
 
   const handleAddAnswer = async () => {
-    if(token != null && token != "") {
+    if(token !== null && token !== "") {
       if (newAnswer.trim() !== '') {
         const answer = {
           "content": newAnswer,
           "questionId": selectedQuestion,
-          "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
+          "userId": username,
         };  
         postData(`${SERVER_API}/Answer`,token,answer) 
         closeModal();
@@ -175,7 +177,7 @@ const Forum = ({id,token}) => {
               headerTitle={
                 <div>
                   <p>
-                    <strong style={{ fontSize: '16px' }}>{"teste2"}</strong> <span style={{ fontSize: '10px' }}>{q.createDate.toLocaleString()}</span>
+                    <strong style={{ fontSize: '16px' }}>{q.username}</strong> <span style={{ fontSize: '10px' }}>{q.createDate.toLocaleString()}</span>
                   </p>
                   <p style={{ fontSize: '20px' }}>{q.content}</p>
                 </div>
@@ -187,7 +189,7 @@ const Forum = ({id,token}) => {
                   <MDBListGroupItem key={answerIndex}>
                     <div>{"> " + answer.content}</div>
                     <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontWeight: 'bold', fontsize: '8px' }}>{"teste2"}</span> 
+                      <span style={{ fontWeight: 'bold', fontsize: '8px' }}>{answer.username}</span> 
                       <span style={{ marginLeft: '8px', fontSize: 'smaller' }}>{new Date(answer.createDate).toLocaleString()}</span>
                     </div>
                   </MDBListGroupItem>

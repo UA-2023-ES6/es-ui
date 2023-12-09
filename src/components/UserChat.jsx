@@ -5,7 +5,7 @@ import {postData,getData} from "../utils/httpRequests";
 
 const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
 
-const UserChat = ({id,token}) => {
+const UserChat = ({id,token,username}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const messageContainerRef = useRef(null);
@@ -15,12 +15,12 @@ const UserChat = ({id,token}) => {
   };
 
   const handleSendMessage = async () => {
-    if(token != null && token != ""){
+    if(token !== null && token !== ""){
       if (newMessage.trim() !== '') {
         const message = {
           "content": newMessage,
           "groupId": id,
-          "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa7", // change later when login is connected to main page
+          "userId": username,
         };
     
           postData(`${SERVER_API}/Message`,token,message)
@@ -47,7 +47,7 @@ const UserChat = ({id,token}) => {
   }, [messages,token]); 
 
   const fetchNewMessages = useCallback(async () => {
-    if(token != null && token != "") {
+    if(token !== null && token !== "") {
       getData(`${SERVER_API}/Message/group/${id}`,token)
       .then(data => {
         setMessages(extractContent(data))
@@ -57,13 +57,13 @@ const UserChat = ({id,token}) => {
   }, [id,token]);
 
   useEffect(() => {
-    if(token != null && token != "") {
+    if(token !== null && token !== "") {
       fetchNewMessages();
     }
   }, [fetchNewMessages,token]);
 
   useEffect(() => {
-    if(token != null && token != "") {
+    if(token !== null && token !== "") {
       const intervalId = setInterval(() => {
         fetchNewMessages();
       }, 1000);

@@ -107,7 +107,7 @@ const Dummy = ({token,username}) => {
 
 
     useEffect(() => {
-        if(token != null && token != "") {
+        if(token !== null && token !== "") {
             getData(`${SERVER_API}/Group`,token)
             .then((response) => {
                 setPathIdMapping(buildPathIdMapping(response.data))
@@ -139,23 +139,89 @@ const Dummy = ({token,username}) => {
             <div className="d-flex" style={{height: "100%"}}>
                 <div className="d-flex flex-column">
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""}/>
+                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""} groupId={selectedId} token={token}/>
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    <Tabs id={selectedId} token={token}/> 
+                    <Tabs id={selectedId} token={token} username={username}/> 
                 </div>
             </div>
         </>
     )
 }
 
-function MySidebar({content,onAddClick,onElementClick,activeLink,basePath}) {
-    return(
+function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupId,token}) {
+    const [showModal, setShowModal] = useState(false);
+    const [groupUsers, setGroupUsers] = useState([]);
+    const [selectedGroupId, setSelectedGroupId] = useState(null);
+
+    const openModal = () => {
+        setSelectedGroupId(groupId);
+        setShowModal(true)
+        fetchGroupUsers(groupId);
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    const fetchGroupUsers = (groupId) => {
+        console.log(groupId)
+        getData(`${SERVER_API}/Group/${groupId}/user?take=${100}&skip=${0}`, token)
+            .then((response) => {
+                console.log(response)
+            setGroupUsers(response.data.users || []);
+            })
+            .catch((error) => {
+            console.error('Error fetching group users:', error);
+            });
+    };
+
+    useEffect(() => {
+        if (selectedGroupId) {
+          fetchGroupUsers(selectedGroupId);
+          console.log(groupUsers)
+        }
+      }, [selectedGroupId]);
+
+    return (
+        <>
+        <div style={{ display: 'flex', justifyContent: 'center',backgroundColor:"#f8f9fa",marginTop:"8px"}}>
+            <button class="btn btn-primary" onClick={() => openModal(groupId)}>View User List</button>
+        </div>
+        <Modal show={showModal} onHide={closeModal}>
+            <Modal.Header closeButton>
+            <Modal.Title>Group Users</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+            <ul>
+                {groupUsers.map((userId) => (
+                <li key={userId}>{/* Display user details here */}</li>
+                ))}
+            </ul>
+            </Modal.Body>
+            <Modal.Footer>
+            <Button variant="secondary" onClick={closeModal}>
+                Close
+            </Button>
+            </Modal.Footer>
+        </Modal>
+
         <Sidebar>
-            {content.map((institution) => <SidebarContent key={institution.name} content={institution} onAddClick={onAddClick} onElementClick={onElementClick} activeLink={activeLink} parentPath={basePath}/> )}
+            {content.map((institution) => (
+            <SidebarContent
+                key={institution.name}
+                content={institution}
+                onAddClick={onAddClick}
+                onElementClick={onElementClick}
+                activeLink={activeLink}
+                parentPath={basePath}
+            />
+            ))}
         </Sidebar>
-    )
+        
+        </>
+    );
 }
 
 function SidebarContent({content,onAddClick,parentPath,onElementClick,activeLink}) {

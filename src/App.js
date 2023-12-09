@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import Dummy from "./pages/Dummy";
 import { Account } from "./components/Account";
 import LoginPage from "./pages/LoginPage";
+import Confirmation from "./pages/Confirmation";
 import { useState } from "react";
 
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
@@ -29,7 +30,8 @@ function App() {
                     <div style={{flex: "1"}}>
                         <Routes>
                             <Route path="/" element={<MainPage />}/>
-                            <Route path="/auth" element={<LoginPage setLoggedIn={setLoggedIn} setIdToken={setIdToken} _setUsername={setUserName}/>}/>
+                            <Route path="/auth/" element={<LoginPage setLoggedIn={setLoggedIn} setIdToken={setIdToken} _setUsername={setUserName}/>}/>
+                            <Route path="/auth/confirmation" element={<Confirmation />}/>
                             <Route path="/home" element={<UserHomePage/>}/>
                             <Route path="/groupName" element={<UserGroupPage />}/>
                             <Route path="/serverTime" element={<ServerTime />} />

@@ -14,7 +14,7 @@ from 'mdb-react-ui-kit';
 import { useState, useContext } from "react"
 import { AccountContext } from "../components/Account"
 import userPool from "../UserPool"
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SuccessMessage from '../components/SuccessMessage';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -56,9 +56,7 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
             console.error(err)
             setError(err.message)
         } else {
-          console.log(data)
-          handleJustifyClick('tab1')
-          setSuccess("User created successfully. Please check your email to confirm your account.")
+          <Link to="auth/confirmation" />
         }
       })
   }

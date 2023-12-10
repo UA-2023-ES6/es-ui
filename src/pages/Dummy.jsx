@@ -5,8 +5,8 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
 import {postData,getData} from "../utils/httpRequests";
-import {MDBListGroup, MDBListGroupItem} from 'mdb-react-ui-kit';
 import SuccessMessage from '../components/SuccessMessage'
+import { GroupConfiguration } from "../components/GroupConfiguration"
 
 const test = {
     data: [
@@ -77,6 +77,7 @@ const Dummy = ({token,username}) => {
     const [show, setShow] = useState(false);
     const [pathIdMapping, setPathIdMapping] = useState({});
     const [selectedId, setSelectedId] = useState(1);
+    const [selectedParentId, setSelectedParentId] = useState(null);
 
     const handleClose = () => setShow(false);
 
@@ -102,6 +103,7 @@ const Dummy = ({token,username}) => {
     const onElementClick = (path) => {
         setPath(path);
         setSelectedId(pathIdMapping[path.substring(1)]);
+        setSelectedParentId(pathIdMapping[path.substring(1, path.lastIndexOf('/'))])
     };
       
 
@@ -139,7 +141,7 @@ const Dummy = ({token,username}) => {
             <div className="d-flex" style={{height: "100%"}}>
                 <div className="d-flex flex-column">
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""} groupId={selectedId} token={token}/>
+                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""} groupId={selectedId} parentGroupId={selectedParentId} token={token}/>
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
@@ -150,15 +152,19 @@ const Dummy = ({token,username}) => {
     )
 }
 
-function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupId,token}) {
-    const [showModal, setShowModal] = useState(false);
-    const [groupUsers, setGroupUsers] = useState([]);
+function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupId,parentGroupId,token}) {
     const [selectedGroupId, setSelectedGroupId] = useState(null);
+    const [selectedParentGroupId, setSelectedParentGroupId] = useState(null);
+    const [groupUsers, setGroupUsers] = useState([]);
+    const [parentGroupUsers, setParentGroupUsers] = useState([]);
+    const [showModal, setShowModal] = useState(false);
 
     const openModal = () => {
-        setSelectedGroupId(groupId);
+        setSelectedGroupId(groupId)
+        setSelectedParentGroupId(parentGroupId)
         setShowModal(true)
-        fetchGroupUsers(groupId);
+        fetchGroupUsers(groupId)
+        fetchParentGroupUsers(parentGroupId)
     };
 
     const closeModal = () => {
@@ -169,53 +175,47 @@ function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupI
         
         getData(`${SERVER_API}/Group/${groupId}/user?take=${100}&skip=${0}`, token)
             .then((response) => {
-                console.log("response:",response)
             setGroupUsers(response.data || []);
             })
             .catch((error) => {
             console.error('Error fetching group users:', error);
             });
-        console.log("groupUsers:",groupUsers)
+    };
+
+    const fetchParentGroupUsers = (parentGroupId) => {
+        
+        if (parentGroupId == null){
+            setParentGroupUsers([]);
+            return;
+        }
+        getData(`${SERVER_API}/Group/${parentGroupId}/user?take=${100}&skip=${0}`, token)
+            .then((response) => {
+            setParentGroupUsers(response.data || []);
+            })
+            .catch((error) => {
+            console.error('Error fetching group users:', error);
+            });
     };
 
     useEffect(() => {
         if (selectedGroupId) {
-          fetchGroupUsers(selectedGroupId);
-          console.log(groupUsers)
+            fetchGroupUsers(selectedGroupId);
+            fetchParentGroupUsers(selectedParentGroupId)
+            console.log("selectedGroupId:",selectedGroupId)
+            console.log("parentGroupId:",selectedParentGroupId)
+            console.log("groupUsers:",groupUsers)
+            console.log("parentGroupUsers:",parentGroupUsers)
         }
-      }, [selectedGroupId]);
+        }, [selectedGroupId]);
+  
+
 
     return (
         <>
         <div style={{ display: 'flex', justifyContent: 'center',backgroundColor:"#f8f9fa",marginTop:"8px"}}>
-            <button class="btn btn-primary" onClick={() => openModal(groupId)}>View User List</button>
+            <button class="btn btn-primary" onClick={() => openModal(groupId)}>Group Configurations</button>
         </div>
-        <Modal show={showModal} onHide={closeModal}>
-            <Modal.Header closeButton>
-                <Modal.Title>Group Users</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <MDBListGroup style={{ minWidth: '22rem' }} light>
-                    {groupUsers.map((user) => (
-                        <MDBListGroupItem
-                            key={user.id}
-                            className='d-flex justify-content-between align-items-center'
-                        >
-                            <div>
-                                <div className='fw-bold'>{user.name}</div>
-                                <div className='text-muted'>{user.email}</div>
-                            </div>
-                           
-                        </MDBListGroupItem>
-                    ))}
-                </MDBListGroup>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={closeModal}>
-                    Close
-                </Button>
-            </Modal.Footer>
-        </Modal>
+        <GroupConfiguration showModal={showModal} closeModal={closeModal} groupUsers={groupUsers} parentGroupUsers={parentGroupUsers} groupId={selectedGroupId} token={token}></GroupConfiguration>
 
         <Sidebar>
             {content.map((institution) => (

@@ -24,7 +24,7 @@ const Tabs = ({id,token,username}) => {
   return (
     <>
       <MDBTabs pills justify className='custom-tabs' >
-        <MDBTabsItem className='custom-tabs-item' style={{borderBottom: '1px solid #ccc', borderLeft: '1px solid #ccc', borderRight: '1px solid #ccc'}}>
+        <MDBTabsItem className='custom-tabs-item' style={{borderBottom: '1px solid #ccc', borderRight: '1px solid #ccc'}}>
           <MDBTabsLink onClick={() => handleTabClick('tab1')} active={activeTab === 'tab1'} className='custom-tabs-link'>
             Messages
           </MDBTabsLink>

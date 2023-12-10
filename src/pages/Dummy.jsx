@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
 import {postData,getData} from "../utils/httpRequests";
-
+import {MDBListGroup, MDBListGroupItem} from 'mdb-react-ui-kit';
 import SuccessMessage from '../components/SuccessMessage'
 
 const test = {
@@ -166,15 +166,16 @@ function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupI
     };
 
     const fetchGroupUsers = (groupId) => {
-        console.log(groupId)
+        
         getData(`${SERVER_API}/Group/${groupId}/user?take=${100}&skip=${0}`, token)
             .then((response) => {
-                console.log(response)
-            setGroupUsers(response.data.users || []);
+                console.log("response:",response)
+            setGroupUsers(response.data || []);
             })
             .catch((error) => {
             console.error('Error fetching group users:', error);
             });
+        console.log("groupUsers:",groupUsers)
     };
 
     useEffect(() => {
@@ -191,19 +192,28 @@ function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupI
         </div>
         <Modal show={showModal} onHide={closeModal}>
             <Modal.Header closeButton>
-            <Modal.Title>Group Users</Modal.Title>
+                <Modal.Title>Group Users</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            <ul>
-                {groupUsers.map((userId) => (
-                <li key={userId}>{/* Display user details here */}</li>
-                ))}
-            </ul>
+                <MDBListGroup style={{ minWidth: '22rem' }} light>
+                    {groupUsers.map((user) => (
+                        <MDBListGroupItem
+                            key={user.id}
+                            className='d-flex justify-content-between align-items-center'
+                        >
+                            <div>
+                                <div className='fw-bold'>{user.name}</div>
+                                <div className='text-muted'>{user.email}</div>
+                            </div>
+                           
+                        </MDBListGroupItem>
+                    ))}
+                </MDBListGroup>
             </Modal.Body>
             <Modal.Footer>
-            <Button variant="secondary" onClick={closeModal}>
-                Close
-            </Button>
+                <Button variant="secondary" onClick={closeModal}>
+                    Close
+                </Button>
             </Modal.Footer>
         </Modal>
 

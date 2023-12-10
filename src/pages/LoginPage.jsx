@@ -13,23 +13,28 @@ from 'mdb-react-ui-kit';
 
 import { useState, useContext } from "react"
 import { AccountContext } from "../components/Account"
-import userPool from "../UserPool"
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SuccessMessage from '../components/SuccessMessage';
+import userPool from "../UserPool";
 import ErrorMessage from '../components/ErrorMessage';
 
 function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
 
-  const [justifyActive, setJustifyActive] = useState('tab1');;
-
+  const [justifyActive, setJustifyActive] = useState('tab1');
   const [username,setUsername] = useState("")
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
 
   const [error,setError] = useState("")
-  const [success,setSuccess] = useState("")
+
+  const {state} = useLocation()
+  const [success,setSuccess] = useState(state != null && state.confirmed ? "Your email has been confirmed!" : "")
 
   const {authenticate} = useContext(AccountContext)
+
+  if(state) {
+    window.history.replaceState(null, "", window.location.pathname);
+  }
 
   const navigate = useNavigate();
 
@@ -37,14 +42,18 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
       event.preventDefault()
       authenticate(email,password)
       .then((data) => {
-          console.log(data)
           setLoggedIn(true)
           setIdToken(data.idToken.jwtToken)
           _setUsername(data.idToken.payload["cognito:username"])
           navigate("/dummy/institution", {state:{success:"Logged in successfully."}})
       })
       .catch((err) => {
+        if(err.name == "UserNotConfirmedException") {
+          navigate("/auth/confirmation",{state: {username: email}})
+        }
+        else {
           setError(err.message)
+        }
       })
       
   }
@@ -56,7 +65,7 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
             console.error(err)
             setError(err.message)
         } else {
-          <Link to="auth/confirmation" />
+          navigate("/auth/confirmation",{state: {username: email}})
         }
       })
   }

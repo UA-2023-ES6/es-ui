@@ -85,7 +85,7 @@ const GroupConfiguration = ({ showModal, closeModal, groupUsers, parentGroupUser
     <>
     <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
-        <Modal.Title>Group Users</Modal.Title>
+        <Modal.Title>Group Configurations</Modal.Title>
         </Modal.Header>
         <Modal.Body>
         <MDBTabs justify className='mb-3'>

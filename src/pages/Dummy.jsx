@@ -5,8 +5,8 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
 import {postData,getData} from "../utils/httpRequests";
-
 import SuccessMessage from '../components/SuccessMessage'
+import { GroupConfiguration } from "../components/GroupConfiguration"
 
 const test = {
     data: [
@@ -77,6 +77,7 @@ const Dummy = ({token,username}) => {
     const [show, setShow] = useState(false);
     const [pathIdMapping, setPathIdMapping] = useState({});
     const [selectedId, setSelectedId] = useState(1);
+    const [selectedParentId, setSelectedParentId] = useState(null);
 
     const handleClose = () => setShow(false);
 
@@ -102,12 +103,13 @@ const Dummy = ({token,username}) => {
     const onElementClick = (path) => {
         setPath(path);
         setSelectedId(pathIdMapping[path.substring(1)]);
+        setSelectedParentId(pathIdMapping[path.substring(1, path.lastIndexOf('/'))])
     };
       
 
 
     useEffect(() => {
-        if(token != null && token != "") {
+        if(token !== null && token !== "") {
             getData(`${SERVER_API}/Group`,token)
             .then((response) => {
                 setPathIdMapping(buildPathIdMapping(response.data))
@@ -139,23 +141,93 @@ const Dummy = ({token,username}) => {
             <div className="d-flex" style={{height: "100%"}}>
                 <div className="d-flex flex-column">
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""}/>
+                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""} groupId={selectedId} parentGroupId={selectedParentId} token={token}/>
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    <Tabs id={selectedId} token={token}/> 
+                    <Tabs id={selectedId} token={token} username={username}/> 
                 </div>
             </div>
         </>
     )
 }
 
-function MySidebar({content,onAddClick,onElementClick,activeLink,basePath}) {
-    return(
+function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupId,parentGroupId,token}) {
+    const [selectedGroupId, setSelectedGroupId] = useState(null);
+    const [selectedParentGroupId, setSelectedParentGroupId] = useState(null);
+    const [groupUsers, setGroupUsers] = useState([]);
+    const [parentGroupUsers, setParentGroupUsers] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+
+    const openModal = () => {
+        setSelectedGroupId(groupId)
+        setSelectedParentGroupId(parentGroupId)
+        setShowModal(true)
+        fetchGroupUsers(groupId)
+        fetchParentGroupUsers(parentGroupId)
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    const fetchGroupUsers = (groupId) => {
+        
+        getData(`${SERVER_API}/Group/${groupId}/user?take=${100}&skip=${0}`, token)
+            .then((response) => {
+            setGroupUsers(response.data || []);
+            })
+            .catch((error) => {
+            console.error('Error fetching group users:', error);
+            });
+    };
+
+    const fetchParentGroupUsers = (parentGroupId) => {
+        
+        if (parentGroupId == null){
+            setParentGroupUsers([]);
+            return;
+        }
+        getData(`${SERVER_API}/Group/${parentGroupId}/user?take=${100}&skip=${0}`, token)
+            .then((response) => {
+            setParentGroupUsers(response.data || []);
+            })
+            .catch((error) => {
+            console.error('Error fetching group users:', error);
+            });
+    };
+
+    useEffect(() => {
+        if (selectedGroupId) {
+            fetchGroupUsers(selectedGroupId);
+            fetchParentGroupUsers(selectedParentGroupId)
+        }
+        }, [selectedGroupId]);
+  
+
+
+    return (
+        <>
+        <div style={{ display: 'flex', justifyContent: 'center',backgroundColor:"#f8f9fa",marginTop:"8px"}}>
+            <button class="btn btn-primary" onClick={() => openModal(groupId)}>Group Configurations</button>
+        </div>
+        <GroupConfiguration showModal={showModal} closeModal={closeModal} groupUsers={groupUsers} parentGroupUsers={parentGroupUsers} groupId={selectedGroupId} token={token}></GroupConfiguration>
+
         <Sidebar>
-            {content.map((institution) => <SidebarContent key={institution.name} content={institution} onAddClick={onAddClick} onElementClick={onElementClick} activeLink={activeLink} parentPath={basePath}/> )}
+            {content.map((institution) => (
+            <SidebarContent
+                key={institution.name}
+                content={institution}
+                onAddClick={onAddClick}
+                onElementClick={onElementClick}
+                activeLink={activeLink}
+                parentPath={basePath}
+            />
+            ))}
         </Sidebar>
-    )
+        
+        </>
+    );
 }
 
 function SidebarContent({content,onAddClick,parentPath,onElementClick,activeLink}) {

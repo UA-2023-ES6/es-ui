@@ -10,7 +10,7 @@ import "../styles/tabs.css";
 import { UserChat } from "./UserChat"
 import { Forum } from "./Forum"
 
-const Tabs = ({id,token}) => {
+const Tabs = ({id,token,username}) => {
   const [activeTab, setActiveTab] = useState('tab1');
   //console.log(selected_id)
   const handleTabClick = (value) => {
@@ -24,7 +24,7 @@ const Tabs = ({id,token}) => {
   return (
     <>
       <MDBTabs pills justify className='custom-tabs' >
-        <MDBTabsItem className='custom-tabs-item' style={{borderBottom: '1px solid #ccc', borderLeft: '1px solid #ccc', borderRight: '1px solid #ccc'}}>
+        <MDBTabsItem className='custom-tabs-item' style={{borderBottom: '1px solid #ccc', borderRight: '1px solid #ccc'}}>
           <MDBTabsLink onClick={() => handleTabClick('tab1')} active={activeTab === 'tab1'} className='custom-tabs-link'>
             Messages
           </MDBTabsLink>
@@ -38,10 +38,10 @@ const Tabs = ({id,token}) => {
 
       <MDBTabsContent>
         <MDBTabsPane open={activeTab === 'tab1'}>
-          <UserChat id={id} token={token}/>
+          <UserChat id={id} token={token} username={username}/>
         </MDBTabsPane>
         <MDBTabsPane open={activeTab === 'tab2'}>
-          <Forum id={id} token={token}/>
+          <Forum id={id} token={token} username={username}/>
         </MDBTabsPane>
       </MDBTabsContent>
     </>

@@ -31,8 +31,6 @@ const UserList = ({ groupUsers, invite, setCheckedUsers }) => {
     }, [checkedUsers, setCheckedUsers]);
 
     const handleUserCheckboxChange = (user,isChecked) => {
-        console.log(user)
-        console.log(checkedUsers)
         setLocalCheckedUsers((prevCheckedUsers) => {
             if (isChecked) {
                 return [...prevCheckedUsers, user];
@@ -68,7 +66,6 @@ const GroupConfiguration = ({ showModal, closeModal, groupUsers, parentGroupUser
     };
   
     const handleInvite = () => {
-        console.log("Checked Users:", checkedUsers);
         const data = {
             }
         

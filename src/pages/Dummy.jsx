@@ -201,10 +201,6 @@ function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupI
         if (selectedGroupId) {
             fetchGroupUsers(selectedGroupId);
             fetchParentGroupUsers(selectedParentGroupId)
-            console.log("selectedGroupId:",selectedGroupId)
-            console.log("parentGroupId:",selectedParentGroupId)
-            console.log("groupUsers:",groupUsers)
-            console.log("parentGroupUsers:",parentGroupUsers)
         }
         }, [selectedGroupId]);
   

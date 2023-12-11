@@ -3,7 +3,7 @@ import { Message } from './Message';
 import send_message_icon from "../imgs/UserChat/send_message_icon.png";
 import {postData,getData} from "../utils/httpRequests";
 
-const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
+const SERVER_API = `${process.env.REACT_APP_SERVER_API}api`
 
 const UserChat = ({id,token,username}) => {
   const [messages, setMessages] = useState([]);

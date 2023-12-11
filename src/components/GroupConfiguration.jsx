@@ -3,7 +3,7 @@ import { MDBListGroup, MDBListGroupItem, MDBTabs, MDBTabsItem, MDBTabsLink, MDBT
 import {postData,getData} from "../utils/httpRequests";
 import { Button, Modal } from 'react-bootstrap';
 
-const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
+const SERVER_API = `${process.env.REACT_APP_SERVER_API}api`
 
 const UserListItem = ({ user, invite, setCheckedUsers }) => {
 

@@ -17,7 +17,7 @@ import {
 import {postData,getData} from "../utils/httpRequests";
 
 
-const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
+const SERVER_API = `${process.env.REACT_APP_SERVER_API}api`
 
 const Forum = ({id,token,username}) => {
     const [questions, setQuestions] = useState([]);

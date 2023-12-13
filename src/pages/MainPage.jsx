@@ -39,7 +39,7 @@ const MainPage = () => {
                                 <div className="d-flex justify-content-center">
                                     <div className="w-75">
                                         <p className="fs-5 text-wrap text-center">
-                                            With {"OneCampus"} you icebreak and socialize easily with other people in your classes, help others, meet new people, stay up-to-date on
+                                            With OneCampus you icebreak and socialize easily with other people in your classes, help others, meet new people, stay up-to-date on
                                             the events of your institution and more...
                                         </p>
                                     </div>

@@ -1,6 +1,6 @@
 import {Sidebar,SidebarGroup,SidebarElement} from "../components/Sidebar"
 import {Tabs} from "../components/Tabs"
-import { Link, useParams, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
@@ -8,70 +8,18 @@ import {postData,getData} from "../utils/httpRequests";
 import SuccessMessage from '../components/SuccessMessage'
 import { GroupConfiguration } from "../components/GroupConfiguration"
 
-const test = {
-    data: [
-      {
-        id: 1,
-        name: "Default Institution",
-        usersIds: [],
-        subGroup: [
-          {
-            id: 2,
-            name: "5",
-            usersIds: [],
-            subGroup: [
-              {
-                id: 3,
-                name: "Group 1.1",
-                usersIds: [],
-                subGroup: [
-                  {
-                    id: 4,
-                    name: "Group 1.1.1",
-                    usersIds: [],
-                    subGroup: []
-                  },
-                  {
-                    id: 7,
-                    name: "5",
-                    usersIds: [],
-                    subGroup: []
-                  }
-                ]
-              },
-              {
-                id: 5,
-                name: "Group 1.2",
-                usersIds: [],
-                subGroup: []
-              }
-            ]
-          },
-          {
-            id: 6,
-            name: "Group 2",
-            usersIds: [],
-            subGroup: []
-          }
-        ]
-      }
-    ]
-  }
-
 const SERVER_API = `${process.env.REACT_APP_SERVER_API}api`
 
-const Dummy = ({token,username}) => {
+const InstitutionsPage = ({token,username}) => {
   
     const {state} = useLocation()
     const [success] = useState(state ? state.success : null)
 
     if (state) {
         window.history.replaceState(null, "", window.location.pathname); //remove the state to prevent the success message from showing up again on refresh
-      }
-    
-    const {"*": currentPath} = useParams();
+    }
     const [groupName, setGroupName] = useState("");
-    const [path, setPath] = useState("/" + test.name);
+    const [path, setPath] = useState("/");
     const [sidebarContent, setSidebarContent] = useState([]);
     const [id, setGroupID] = useState(-1);
     const [show, setShow] = useState(false);
@@ -118,24 +66,6 @@ const Dummy = ({token,username}) => {
         }
     },[token])
 
-    
-    if(currentPath === "") {
-        return(
-            <>
-                <h1>Dummy page for testing</h1>
-                <p>in the future replace this code with an automatic redirect to </p>
-                <Link to={"/*"}>
-                    <button>here</button>
-                </Link>
-
-                <p>if you're here to test the groups page go </p>
-                <Link to={"Instituicao"}>
-                    <button>here</button>
-                </Link>
-            </>
-        )
-    }
-
     return(
         <>
             <div className="d-flex" style={{height: "100%"}}>
@@ -145,7 +75,7 @@ const Dummy = ({token,username}) => {
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    <Tabs id={selectedId} token={token} username={username}/> 
+                    {/* <Tabs id={selectedId} token={token} username={username}/>  */}
                 </div>
             </div>
         </>
@@ -209,7 +139,7 @@ function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupI
     return (
         <>
         <div style={{ display: 'flex', justifyContent: 'center',backgroundColor:"#f8f9fa",marginTop:"8px"}}>
-            <button class="btn btn-primary" onClick={() => openModal(groupId)}>Group Configurations</button>
+            <button className="btn btn-primary" onClick={() => openModal(groupId)}>Group Configurations</button>
         </div>
         <GroupConfiguration showModal={showModal} closeModal={closeModal} groupUsers={groupUsers} parentGroupUsers={parentGroupUsers} groupId={selectedGroupId} token={token}></GroupConfiguration>
 
@@ -354,4 +284,4 @@ function AddBtn({onClick,id}) {
 }
 
 
-export default Dummy
+export default InstitutionsPage

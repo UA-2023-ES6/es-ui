@@ -13,8 +13,7 @@ from 'mdb-react-ui-kit';
 
 import { useState, useContext } from "react"
 import { AccountContext } from "../components/Account"
-import { useLocation, useNavigate } from "react-router-dom";
-import SuccessMessage from '../components/SuccessMessage';
+import { useNavigate } from "react-router-dom";
 import userPool from "../UserPool";
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -27,14 +26,7 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
 
   const [error,setError] = useState("")
 
-  const {state} = useLocation()
-  const [success,setSuccess] = useState(state != null && state.confirmed ? "Your email has been confirmed!" : "")
-
   const {authenticate} = useContext(AccountContext)
-
-  if(state) {
-    window.history.replaceState(null, "", window.location.pathname);
-  }
 
   const navigate = useNavigate();
 
@@ -78,14 +70,12 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
     setEmail("")
     setPassword("")
     setError("")
-    setSuccess("")
     setJustifyActive(value);
   };
 
   return (
     <MDBContainer className="p-3 my-5 d-flex flex-column w-50">
       {error ? <ErrorMessage message={error}/> : null}
-      {success ? <SuccessMessage message={success}/> : null}
 
       <MDBTabs pills justify className='mb-3 d-flex flex-row justify-content-between'>
         <MDBTabsItem>

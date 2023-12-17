@@ -37,7 +37,7 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
           setLoggedIn(true)
           setIdToken(data.idToken.jwtToken)
           _setUsername(data.idToken.payload["cognito:username"])
-          navigate("/dummy/institution", {state:{success:"Logged in successfully."}})
+          navigate("/institutions", {state:{success:"Logged in successfully."}})
       })
       .catch((err) => {
         if(err.name == "UserNotConfirmedException") {

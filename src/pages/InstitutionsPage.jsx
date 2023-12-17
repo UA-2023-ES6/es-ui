@@ -1,6 +1,6 @@
 import {Sidebar,SidebarGroup,SidebarElement} from "../components/Sidebar"
 import {Tabs} from "../components/Tabs"
-import { Link, useParams, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { useEffect, useState } from 'react'
@@ -8,59 +8,9 @@ import {postData,getData} from "../utils/httpRequests";
 import SuccessMessage from '../components/SuccessMessage'
 import { GroupConfiguration } from "../components/GroupConfiguration"
 
-const test = {
-    data: [
-      {
-        id: 1,
-        name: "Default Institution",
-        usersIds: [],
-        subGroup: [
-          {
-            id: 2,
-            name: "5",
-            usersIds: [],
-            subGroup: [
-              {
-                id: 3,
-                name: "Group 1.1",
-                usersIds: [],
-                subGroup: [
-                  {
-                    id: 4,
-                    name: "Group 1.1.1",
-                    usersIds: [],
-                    subGroup: []
-                  },
-                  {
-                    id: 7,
-                    name: "5",
-                    usersIds: [],
-                    subGroup: []
-                  }
-                ]
-              },
-              {
-                id: 5,
-                name: "Group 1.2",
-                usersIds: [],
-                subGroup: []
-              }
-            ]
-          },
-          {
-            id: 6,
-            name: "Group 2",
-            usersIds: [],
-            subGroup: []
-          }
-        ]
-      }
-    ]
-  }
-
 const SERVER_API = `${process.env.REACT_APP_SERVER_API}api`
 
-const Dummy = ({token,username}) => {
+const InstitutionsPage = ({token,username}) => {
   
     const {state} = useLocation()
     const [success] = useState(state ? state.success : null)
@@ -71,7 +21,7 @@ const Dummy = ({token,username}) => {
     
     const {"*": currentPath} = useParams();
     const [groupName, setGroupName] = useState("");
-    const [path, setPath] = useState("/" + test.name);
+    const [path, setPath] = useState("/");
     const [sidebarContent, setSidebarContent] = useState([]);
     const [id, setGroupID] = useState(-1);
     const [show, setShow] = useState(false);
@@ -135,24 +85,6 @@ const Dummy = ({token,username}) => {
             }).catch(err => console.log(err))
         }
     },[token])
-
-    
-    if(currentPath === "") {
-        return(
-            <>
-                <h1>Dummy page for testing</h1>
-                <p>in the future replace this code with an automatic redirect to </p>
-                <Link to={"/*"}>
-                    <button>here</button>
-                </Link>
-
-                <p>if you're here to test the groups page go </p>
-                <Link to={"Instituicao"}>
-                    <button>here</button>
-                </Link>
-            </>
-        )
-    }
 
     return(
         <>
@@ -228,7 +160,7 @@ function MySidebar({username,content,onAddClick,onElementClick,activeLink,basePa
     return (
         <>
         <div style={{ display: 'flex', justifyContent: 'center',backgroundColor:"#f8f9fa",marginTop:"8px"}}>
-            <button class="btn btn-primary" onClick={() => openModal(groupId)}>Group Configurations</button>
+            <button className="btn btn-primary" onClick={() => openModal(groupId)}>Group Configurations</button>
         </div>
         <GroupConfiguration permissionInvite={permissionInvite} permissionEditp={permissionEditp} username={username} showModal={showModal} closeModal={closeModal} groupUsers={groupUsers} parentGroupUsers={parentGroupUsers} groupId={selectedGroupId} token={token}></GroupConfiguration>
 
@@ -373,4 +305,4 @@ function AddBtn({onClick,id}) {
 }
 
 
-export default Dummy
+export default InstitutionsPage

@@ -19,7 +19,6 @@ const InstitutionsPage = ({token,username}) => {
         window.history.replaceState(null, "", window.location.pathname); //remove the state to prevent the success message from showing up again on refresh
     }
     
-    const {"*": currentPath} = useParams();
     const [groupName, setGroupName] = useState("");
     const [path, setPath] = useState("/");
     const [sidebarContent, setSidebarContent] = useState([]);

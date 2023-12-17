@@ -19,7 +19,7 @@ import {postData,getData} from "../utils/httpRequests";
 
 const SERVER_API = `${process.env.REACT_APP_SERVER_API}api`
 
-const Forum = ({id,token,username}) => {
+const Forum = ({id,token,username,permissionQuestion,permissionAnswer}) => {
     const [questions, setQuestions] = useState([]);
     const [filteredQuestions, setFilteredQuestions] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -194,22 +194,21 @@ const Forum = ({id,token,username}) => {
                     </div>
                   </MDBListGroupItem>
                 ))}
-                <MDBListGroupItem style={{ 
-                  backgroundColor: '#f0f0f0',
-                  borderTopLeftRadius: '8px',
-                  borderTopRightRadius: '8px',
-                  }}>
-                  <div
-                    style={{ textAlign: 'center', fontWeight: 'bold', cursor: 'pointer',marginLeft: '5px' }}
-                    onClick={() => openModal(q.questionId)}
-                  >
-                    {"Add New Answer"}
-                  </div>
-                </MDBListGroupItem>
+                {permissionAnswer && (
+                  <MDBListGroupItem style={{ 
+                    backgroundColor: '#f0f0f0',
+                    borderTopLeftRadius: '8px',
+                    borderTopRightRadius: '8px',
+                    }}>
+                    <div
+                      style={{ textAlign: 'center', fontWeight: 'bold', cursor: 'pointer',marginLeft: '5px' }}
+                      onClick={() => openModal(q.questionId)}
+                    >
+                      {"Add New Answer"}
+                    </div>
+                  </MDBListGroupItem>
+                )}
               </MDBListGroup>
-              
-              
-
             </MDBAccordionItem>
           ))}
         </MDBAccordion>
@@ -243,41 +242,43 @@ const Forum = ({id,token,username}) => {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-        <div style={{ position: 'relative', width: '600px' }}>
-          <textarea
-            placeholder="Add a new question..."
-            value={newQuestion}
-            onChange={(e) => setNewQuestion(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendQuestion();
-              }
-            }}
-            style={{
-              borderRadius: '5px',
-              width: '100%',
-              height: '37px',
-              paddingLeft: '8px',
-              resize: 'none',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              marginTop: '0px'
-            }}
-          />
-          <img
-            src={add_answer_icon}
-            alt="Send"
-            style={{
-              cursor: 'pointer',
-              position: 'absolute',
-              width: '45px',
-              height: '45px',
-              transform: 'translateY(-10%)',
-            }}
-            onClick={handleSendQuestion}
-          />
-        </div>
+        {permissionQuestion && (
+          <div style={{ position: 'relative', width: '600px' }}>
+            <textarea
+              placeholder="Add a new question..."
+              value={newQuestion}
+              onChange={(e) => setNewQuestion(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendQuestion();
+                }
+              }}
+              style={{
+                borderRadius: '5px',
+                width: '100%',
+                height: '37px',
+                paddingLeft: '8px',
+                resize: 'none',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                marginTop: '0px'
+              }}
+            />
+            <img
+              src={add_answer_icon}
+              alt="Send"
+              style={{
+                cursor: 'pointer',
+                position: 'absolute',
+                width: '45px',
+                height: '45px',
+                transform: 'translateY(-10%)',
+              }}
+              onClick={handleSendQuestion}
+            />
+          </div>
+        )}
       </div>
 
 

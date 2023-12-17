@@ -5,7 +5,7 @@ import {postData,getData} from "../utils/httpRequests";
 
 const SERVER_API = `${process.env.REACT_APP_SERVER_API}api`
 
-const UserChat = ({id,token,username}) => {
+const UserChat = ({id,token,username,permission}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const messageContainerRef = useRef(null);
@@ -66,6 +66,7 @@ const UserChat = ({id,token,username}) => {
     if(token !== null && token !== "") {
       const intervalId = setInterval(() => {
         fetchNewMessages();
+        console.log("here:",permission)
       }, 1000);
       return () => {
         clearInterval(intervalId);
@@ -102,41 +103,43 @@ const UserChat = ({id,token,username}) => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-          <div style={{ position: 'relative', width: '600px' }}>
-            <textarea
-              placeholder="Type your message..."
-              value={newMessage}
-              onChange={handleInputChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              style={{
-                borderRadius: '5px',
-                width: '100%',
-                height: '37px',
-                paddingLeft: '8px',
-                resize: 'none',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                marginTop: '0px'
-              }}
-            />
-            <img
-              src={send_message_icon}
-              alt="Send"
-              style={{
-                cursor: 'pointer',
-                position: 'absolute',
-                right: -50,
-                bottom: '50%',
-                transform: 'translateY(50%)',
-              }}
-              onClick={handleSendMessage}
-            />
-          </div>
+            {permission && (
+              <div style={{ position: 'relative', width: '600px' }}>
+                <textarea
+                  placeholder="Type your message..."
+                  value={newMessage}
+                  onChange={handleInputChange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  style={{
+                    borderRadius: '5px',
+                    width: '100%',
+                    height: '37px',
+                    paddingLeft: '8px',
+                    resize: 'none',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    marginTop: '0px'
+                  }}
+                />
+                <img
+                  src={send_message_icon}
+                  alt="Send"
+                  style={{
+                    cursor: 'pointer',
+                    position: 'absolute',
+                    right: -50,
+                    bottom: '50%',
+                    transform: 'translateY(50%)',
+                  }}
+                  onClick={handleSendMessage}
+                />
+              </div>    
+            )}
         </div>
 
 

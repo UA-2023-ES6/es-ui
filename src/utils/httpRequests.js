@@ -21,6 +21,28 @@ async function postData(url="",token,data= {}) {
 
 }
 
+async function deleteData(url = "", token, data = {}) {
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function getData(url="",token="") {
     try {
         const response = await fetch(url, {
@@ -41,4 +63,4 @@ async function getData(url="",token="") {
       }
 }
 
-export {postData,getData}
+export {postData,getData,deleteData}

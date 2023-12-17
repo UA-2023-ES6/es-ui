@@ -78,6 +78,7 @@ const Dummy = ({token,username}) => {
     const [pathIdMapping, setPathIdMapping] = useState({});
     const [selectedId, setSelectedId] = useState(1);
     const [selectedParentId, setSelectedParentId] = useState(null);
+    const [permissions, setPermissions] = useState([])
 
     const handleClose = () => setShow(false);
 
@@ -104,6 +105,7 @@ const Dummy = ({token,username}) => {
         setPath(path);
         setSelectedId(pathIdMapping[path.substring(1)]);
         setSelectedParentId(pathIdMapping[path.substring(1, path.lastIndexOf('/'))])
+        console.log(permissions)
     };
       
 
@@ -141,7 +143,7 @@ const Dummy = ({token,username}) => {
             <div className="d-flex" style={{height: "100%"}}>
                 <div className="d-flex flex-column">
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                    <MySidebar content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""} groupId={selectedId} parentGroupId={selectedParentId} token={token}/>
+                    <MySidebar username={username} setPermissions={setPermissions} content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""} groupId={selectedId} parentGroupId={selectedParentId} token={token}/>
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
@@ -152,7 +154,7 @@ const Dummy = ({token,username}) => {
     )
 }
 
-function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupId,parentGroupId,token}) {
+function MySidebar({username,setPermissions,content,onAddClick,onElementClick,activeLink,basePath,groupId,parentGroupId,token}) {
     const [selectedGroupId, setSelectedGroupId] = useState(null);
     const [selectedParentGroupId, setSelectedParentGroupId] = useState(null);
     const [groupUsers, setGroupUsers] = useState([]);
@@ -197,8 +199,20 @@ function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupI
             });
     };
 
+    const fetchPermissions = (groupId) => {
+        const data = {};
+        getData(`${SERVER_API}/Permission/group/${groupId}/user/${username}`, token, data)
+        .then((response) => {
+            setPermissions(response)
+        })
+        .catch((error) => {
+            console.error('Error fetching permissions:', error);
+        });
+    }
+
     useEffect(() => {
         if (selectedGroupId) {
+            fetchPermissions(selectedGroupId)
             fetchGroupUsers(selectedGroupId);
             fetchParentGroupUsers(selectedParentGroupId)
         }
@@ -211,7 +225,7 @@ function MySidebar({content,onAddClick,onElementClick,activeLink,basePath,groupI
         <div style={{ display: 'flex', justifyContent: 'center',backgroundColor:"#f8f9fa",marginTop:"8px"}}>
             <button class="btn btn-primary" onClick={() => openModal(groupId)}>Group Configurations</button>
         </div>
-        <GroupConfiguration showModal={showModal} closeModal={closeModal} groupUsers={groupUsers} parentGroupUsers={parentGroupUsers} groupId={selectedGroupId} token={token}></GroupConfiguration>
+        <GroupConfiguration username={username} showModal={showModal} closeModal={closeModal} groupUsers={groupUsers} parentGroupUsers={parentGroupUsers} groupId={selectedGroupId} token={token}></GroupConfiguration>
 
         <Sidebar>
             {content.map((institution) => (

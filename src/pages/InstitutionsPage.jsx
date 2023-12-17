@@ -75,7 +75,7 @@ const InstitutionsPage = ({token,username}) => {
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    {/* <Tabs id={selectedId} token={token} username={username}/>  */}
+                    <Tabs id={selectedId} token={token} username={username}/> 
                 </div>
             </div>
         </>

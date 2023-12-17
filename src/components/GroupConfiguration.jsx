@@ -9,7 +9,7 @@ import { Permissions } from './Permissions';
 
 const SERVER_API = `${process.env.REACT_APP_SERVER_API}/api`
 
-const GroupConfiguration = ({ username, showModal, closeModal, groupUsers, parentGroupUsers, groupId, token }) => {
+const GroupConfiguration = ({ permissionInvite, permissionEditp, username, showModal, closeModal, groupUsers, parentGroupUsers, groupId, token }) => {
     const [justifyActive, setJustifyActive] = useState('tab1');
     const [checkedUsers, setCheckedUsers] = useState([]);
     const [CheckedUsersPermissions, setCheckedUsersPermissions] = useState([]);
@@ -110,16 +110,20 @@ const GroupConfiguration = ({ username, showModal, closeModal, groupUsers, paren
                 User List
             </MDBTabsLink>
             </MDBTabsItem>
-            <MDBTabsItem>
-            <MDBTabsLink onClick={() => handleJustifyClick('tab2')} active={justifyActive === 'tab2'}>
-                Invite Users
-            </MDBTabsLink>
-            </MDBTabsItem>
-            <MDBTabsItem>
-            <MDBTabsLink onClick={() => handleJustifyClick('tab3')} active={justifyActive === 'tab3'}>
-                Edit Permissions
-            </MDBTabsLink>
-            </MDBTabsItem>
+            {permissionInvite &&(
+                <MDBTabsItem>
+                <MDBTabsLink onClick={() => handleJustifyClick('tab2')} active={justifyActive === 'tab2'}>
+                    Invite Users
+                </MDBTabsLink>
+                </MDBTabsItem>
+            )}
+            {permissionEditp &&(
+                <MDBTabsItem>
+                <MDBTabsLink onClick={() => handleJustifyClick('tab3')} active={justifyActive === 'tab3'}>
+                    Edit Permissions
+                </MDBTabsLink>
+                </MDBTabsItem>
+            )}
         </MDBTabs>
 
         <MDBTabsContent>
@@ -128,29 +132,33 @@ const GroupConfiguration = ({ username, showModal, closeModal, groupUsers, paren
                     <UserList groupUsers={groupUsers} invite={false} setCheckedUsers={setCheckedUsers}/>
                 )}
             </MDBTabsPane>
-            <MDBTabsPane open={justifyActive === 'tab2'}>
-                {justifyActive === 'tab2' && (
-                    <UserList
-                        groupUsers={parentGroupUsers.filter((parentUser) => {
-                            return !groupUsers.some((groupUser) => groupUser.id === parentUser.id);
-                        })}
-                        invite={true}
-                        setCheckedUsers={setCheckedUsers}
-                    />
-                )}
-            </MDBTabsPane>
-            <MDBTabsPane open={justifyActive === 'tab3'} style={{ display: 'flex' }}>
-                <div style={{ flex: '1', borderRight: '1px solid #ccc', paddingRight: '10px' }}>
-                    {justifyActive === 'tab3' && (
-                    <EditPermissions groupUsers={groupUsers.filter((user) => user.id !== username)} setCheckedUsersPermissions={setCheckedUsersPermissions} />
+            {permissionInvite &&(
+                <MDBTabsPane open={justifyActive === 'tab2'}>
+                    {justifyActive === 'tab2' && (
+                        <UserList
+                            groupUsers={parentGroupUsers.filter((parentUser) => {
+                                return !groupUsers.some((groupUser) => groupUser.id === parentUser.id);
+                            })}
+                            invite={true}
+                            setCheckedUsers={setCheckedUsers}
+                        />
                     )}
-                </div>
-                <div style={{ flex: '1', paddingLeft: '10px' }}>
-                    {justifyActive === 'tab3' && (
-                    <Permissions selectedPermissions={checkedPermissions} setSelectedPermissions={setCheckedPermissions} />
-                    )}
-                </div>
-            </MDBTabsPane>
+                </MDBTabsPane>
+            )}
+            {permissionEditp &&(
+                <MDBTabsPane open={justifyActive === 'tab3'} style={{ display: 'flex' }}>
+                    <div style={{ flex: '1', borderRight: '1px solid #ccc', paddingRight: '10px' }}>
+                        {justifyActive === 'tab3' && (
+                        <EditPermissions groupUsers={groupUsers.filter((user) => user.id !== username)} setCheckedUsersPermissions={setCheckedUsersPermissions} />
+                        )}
+                    </div>
+                    <div style={{ flex: '1', paddingLeft: '10px' }}>
+                        {justifyActive === 'tab3' && (
+                        <Permissions selectedPermissions={checkedPermissions} setSelectedPermissions={setCheckedPermissions} />
+                        )}
+                    </div>
+                </MDBTabsPane>
+            )}
         </MDBTabsContent>
         </Modal.Body>
         <Modal.Footer>

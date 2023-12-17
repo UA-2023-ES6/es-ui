@@ -84,7 +84,9 @@ const Dummy = ({token,username}) => {
 
     const handleShow = (id) => {
         setGroupID(id);
-        setShow(true);
+        if(permissions.includes(1)){
+            setShow(true);
+        }
     };
 
     const handleChange = (e) => setGroupName(e.target.value);
@@ -105,10 +107,24 @@ const Dummy = ({token,username}) => {
         setPath(path);
         setSelectedId(pathIdMapping[path.substring(1)]);
         setSelectedParentId(pathIdMapping[path.substring(1, path.lastIndexOf('/'))])
-        //console.log(permissions)
+        fetchPermissions(selectedId)
+        console.log(permissions)
     };
-      
 
+    useEffect(() => {
+        console.log(permissions.includes(2));
+      }, [permissions]);      
+      
+    const fetchPermissions = (groupId) => {
+        const data = {};
+        getData(`${SERVER_API}/Permission/group/${groupId}/user/${username}`, token, data)
+        .then((response) => {
+            setPermissions(response.data.permissions)
+        })
+        .catch((error) => {
+            console.error('Error fetching permissions:', error);
+        });
+    }
 
     useEffect(() => {
         if(token !== null && token !== "") {
@@ -143,18 +159,18 @@ const Dummy = ({token,username}) => {
             <div className="d-flex" style={{height: "100%"}}>
                 <div className="d-flex flex-column">
                     <CreateGroupModal show={show} handleClose={handleClose} onNameChange={handleChange} onCreate={handleCreate}/>
-                    <MySidebar username={username} setPermissions={setPermissions} content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""} groupId={selectedId} parentGroupId={selectedParentId} token={token}/>
+                    <MySidebar permissionInvite={permissions.includes(5)} permissionEditp={permissions.includes(6)} username={username} content={sidebarContent} onAddClick={handleShow} onElementClick={onElementClick} activeLink={path} basePath={""} groupId={selectedId} parentGroupId={selectedParentId} token={token}/>
                 </div>
                 <div className="flex-grow-1">
                     {success ? <SuccessMessage message={success}/> : null}
-                    <Tabs id={selectedId} token={token} username={username}/> 
+                    <Tabs id={selectedId} token={token} username={username} permissionChat={permissions.includes(2)} permissionQuestion={permissions.includes(3)} permissionAnswer={permissions.includes(4)}/> 
                 </div>
             </div>
         </>
     )
 }
 
-function MySidebar({username,setPermissions,content,onAddClick,onElementClick,activeLink,basePath,groupId,parentGroupId,token}) {
+function MySidebar({username,content,onAddClick,onElementClick,activeLink,basePath,groupId,parentGroupId,token,permissionInvite,permissionEditp}) {
     const [selectedGroupId, setSelectedGroupId] = useState(null);
     const [selectedParentGroupId, setSelectedParentGroupId] = useState(null);
     const [groupUsers, setGroupUsers] = useState([]);
@@ -199,20 +215,9 @@ function MySidebar({username,setPermissions,content,onAddClick,onElementClick,ac
             });
     };
 
-    const fetchPermissions = (groupId) => {
-        const data = {};
-        getData(`${SERVER_API}/Permission/group/${groupId}/user/${username}`, token, data)
-        .then((response) => {
-            setPermissions(response.data.permissions)
-        })
-        .catch((error) => {
-            console.error('Error fetching permissions:', error);
-        });
-    }
 
     useEffect(() => {
         if (selectedGroupId) {
-            fetchPermissions(selectedGroupId)
             fetchGroupUsers(selectedGroupId);
             fetchParentGroupUsers(selectedParentGroupId)
         }
@@ -225,7 +230,7 @@ function MySidebar({username,setPermissions,content,onAddClick,onElementClick,ac
         <div style={{ display: 'flex', justifyContent: 'center',backgroundColor:"#f8f9fa",marginTop:"8px"}}>
             <button class="btn btn-primary" onClick={() => openModal(groupId)}>Group Configurations</button>
         </div>
-        <GroupConfiguration username={username} showModal={showModal} closeModal={closeModal} groupUsers={groupUsers} parentGroupUsers={parentGroupUsers} groupId={selectedGroupId} token={token}></GroupConfiguration>
+        <GroupConfiguration permissionInvite={permissionInvite} permissionEditp={permissionEditp} username={username} showModal={showModal} closeModal={closeModal} groupUsers={groupUsers} parentGroupUsers={parentGroupUsers} groupId={selectedGroupId} token={token}></GroupConfiguration>
 
         <Sidebar>
             {content.map((institution) => (

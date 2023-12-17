@@ -10,7 +10,7 @@ const Permissions = ({ selectedPermissions, setSelectedPermissions }) => {
                           {id:2,name:"Send Messages"},
                           {id:3,name:"Post Questions"},
                           {id:4,name:"Submit Answers"},
-                          {id:5,name:"Invite Other Users"},
+                          {id:5,name:"View and Invite Other Users"},
                           {id:6,name:"Edit Other Users' Permissions"}]
 
   useEffect(() => {

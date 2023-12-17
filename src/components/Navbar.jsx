@@ -33,7 +33,7 @@ const Navbar = ({setLoggedIn,isLoggedIn,setIdToken,setUserName}) => {
             <div className="container-fluid">
                 <div className="collapse navbar-collapse">
                     <NavbarLinks/>
-                    {isLoggedIn ? <NavbarUser logout={uiLogout}/> : currentPath.pathname === "/auth" ? null : <NavbarLogin/>}
+                    {isLoggedIn ? <NavbarUser logout={uiLogout}/> : currentPath.pathname === "/auth" || currentPath.pathname === "/auth/confirmation" ? null : <NavbarLogin/>}
                 </div>
             </div>
         </nav>

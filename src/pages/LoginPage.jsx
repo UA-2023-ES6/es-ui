@@ -13,21 +13,18 @@ from 'mdb-react-ui-kit';
 
 import { useState, useContext } from "react"
 import { AccountContext } from "../components/Account"
-import userPool from "../UserPool"
 import { useNavigate } from "react-router-dom";
-import SuccessMessage from '../components/SuccessMessage';
+import userPool from "../UserPool";
 import ErrorMessage from '../components/ErrorMessage';
 
 function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
 
-  const [justifyActive, setJustifyActive] = useState('tab1');;
-
+  const [justifyActive, setJustifyActive] = useState('tab1');
   const [username,setUsername] = useState("")
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
 
   const [error,setError] = useState("")
-  const [success,setSuccess] = useState("")
 
   const {authenticate} = useContext(AccountContext)
 
@@ -37,14 +34,18 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
       event.preventDefault()
       authenticate(email,password)
       .then((data) => {
-          console.log(data)
           setLoggedIn(true)
           setIdToken(data.idToken.jwtToken)
           _setUsername(data.idToken.payload["cognito:username"])
           navigate("/dummy/institution", {state:{success:"Logged in successfully."}})
       })
       .catch((err) => {
+        if(err.name == "UserNotConfirmedException") {
+          navigate("/auth/confirmation",{state: {username: email}})
+        }
+        else {
           setError(err.message)
+        }
       })
       
   }
@@ -56,9 +57,7 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
             console.error(err)
             setError(err.message)
         } else {
-          console.log(data)
-          handleJustifyClick('tab1')
-          setSuccess("User created successfully. Please check your email to confirm your account.")
+          navigate("/auth/confirmation",{state: {username: email}})
         }
       })
   }
@@ -71,14 +70,12 @@ function LoginPage({setLoggedIn,setIdToken,_setUsername}) {
     setEmail("")
     setPassword("")
     setError("")
-    setSuccess("")
     setJustifyActive(value);
   };
 
   return (
     <MDBContainer className="p-3 my-5 d-flex flex-column w-50">
       {error ? <ErrorMessage message={error}/> : null}
-      {success ? <SuccessMessage message={success}/> : null}
 
       <MDBTabs pills justify className='mb-3 d-flex flex-row justify-content-between'>
         <MDBTabsItem>

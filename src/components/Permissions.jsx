@@ -6,12 +6,12 @@ const Permissions = ({ selectedPermissions, setSelectedPermissions }) => {
   const [checkedPermissions, setCheckedPermissions] = useState([]);
 
   const permissionsList = [
-                          {id:1,name:"CreateSubGroup"},
-                          {id:2,name:"CreateMessage"},
-                          {id:3,name:"CreateQuestion"},
-                          {id:4,name:"CreateAnswer"},
-                          {id:5,name:"ManageUsers"},
-                          {id:6,name:"ManageUsersPermission"}]
+                          {id:1,name:"Create a Subgroup"},
+                          {id:2,name:"Send Messages"},
+                          {id:3,name:"Post Questions"},
+                          {id:4,name:"Submit Answers"},
+                          {id:5,name:"Invite Other Users"},
+                          {id:6,name:"Edit Other Users' Permissions"}]
 
   useEffect(() => {
     setSelectedPermissions(checkedPermissions);

@@ -105,7 +105,7 @@ const Dummy = ({token,username}) => {
         setPath(path);
         setSelectedId(pathIdMapping[path.substring(1)]);
         setSelectedParentId(pathIdMapping[path.substring(1, path.lastIndexOf('/'))])
-        console.log(permissions)
+        //console.log(permissions)
     };
       
 
@@ -203,7 +203,7 @@ function MySidebar({username,setPermissions,content,onAddClick,onElementClick,ac
         const data = {};
         getData(`${SERVER_API}/Permission/group/${groupId}/user/${username}`, token, data)
         .then((response) => {
-            setPermissions(response)
+            setPermissions(response.data.permissions)
         })
         .catch((error) => {
             console.error('Error fetching permissions:', error);

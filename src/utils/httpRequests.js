@@ -54,6 +54,9 @@ async function getData(url="",token="") {
         });
     
         if (!response.ok) {
+          if (response.status === 403){
+            return "Forbidden"
+          }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
     

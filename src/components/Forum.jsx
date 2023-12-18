@@ -78,14 +78,18 @@ const Forum = ({id,token,username,permissionQuestion,permissionAnswer}) => {
   const fetchNewQuestions = useCallback(async () => {
     if(token !== null && token !== "") {
       const data = await getData(`${SERVER_API}/Question/group/${id}`,token)
-      setQuestions(extractContent(data));
+      if (data === "Forbidden"){
+        setQuestions(questions)
+      }else{
+        setQuestions(extractContent(data));
 
-      for (const q of extractContent(data)) {
-        const answers = await fetchAnswersForQuestion(q.questionId)
-        setQuestionAnswers(prevQuestionAnswers => ({
-                          ...prevQuestionAnswers,
-                          [q.questionId]: answers,
-                          })); 
+        for (const q of extractContent(data)) {
+          const answers = await fetchAnswersForQuestion(q.questionId)
+          setQuestionAnswers(prevQuestionAnswers => ({
+                            ...prevQuestionAnswers,
+                            [q.questionId]: answers,
+                            })); 
+      } 
       }
     }
   }, [id,token]);

@@ -66,7 +66,7 @@ const UserChat = ({id,token,username,permission}) => {
     if(token !== null && token !== "") {
       const intervalId = setInterval(() => {
         fetchNewMessages();
-        console.log("here:",permission)
+        //console.log("here:",permission)
       }, 1000);
       return () => {
         clearInterval(intervalId);
